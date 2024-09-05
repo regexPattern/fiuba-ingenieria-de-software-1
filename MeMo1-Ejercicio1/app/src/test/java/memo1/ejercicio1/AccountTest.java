@@ -3,10 +3,7 @@ package memo1.ejercicio1;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-// Pruebas unitarias
-
 class AccountTest {
-
     @Test
     void defaultConstructorShouldInitializeBalanceToZero() {
         Account account = new Account();

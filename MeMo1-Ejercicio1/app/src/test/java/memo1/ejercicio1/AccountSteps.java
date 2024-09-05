@@ -3,8 +3,6 @@ package memo1.ejercicio1;
 import static org.junit.Assert.*;
 import io.cucumber.java.en.*;
 
-// Pruebas funcionales basadas en los escenarios Gherkin
-
 public class AccountSteps {
     private Account account;
     private boolean operationResult;
