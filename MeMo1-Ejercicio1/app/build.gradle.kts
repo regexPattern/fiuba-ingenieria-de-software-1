@@ -33,8 +33,8 @@ tasks.register<Test>("cucumberTest") {
     include("**/RunCucumberTest*")
 
     testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
+        events("failed")
+        showStandardStreams = false
     }
 }
 
@@ -42,7 +42,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 
     testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
+        events("failed")
+        showStandardStreams = false
     }
 }
