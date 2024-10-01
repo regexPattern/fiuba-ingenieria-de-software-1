@@ -58,4 +58,16 @@ public class Account {
         return true;
     }
 
+    public boolean transfer(Account receiver, double amount) {
+        if (receiver == null) {
+            throw new IllegalArgumentException("Target account cannot be null.");
+        } else if (receiver.cbu == cbu || amount < 0 || balance - amount < 0) {
+            return false;
+        }
+
+        balance -= amount;
+        receiver.setBalance(receiver.balance + amount);
+
+        return true;
+    }
 }
