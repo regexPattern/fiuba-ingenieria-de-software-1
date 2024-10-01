@@ -117,4 +117,11 @@ class AccountTest {
         Account account = new Account(123L, 100.0);
         assertFalse(account.transfer(new Account(), 2000.0));
     }
+
+    @Test
+    void transferShouldAllowExactAmount() {
+        Account account = new Account(123L, 100.0);
+        assertTrue(account.transfer(new Account(), account.getBalance()));
+        assertEquals(account.getBalance(), 0.0);
+    }
 }

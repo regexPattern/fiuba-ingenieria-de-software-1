@@ -24,7 +24,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("memo1.ejercicio1.App")
+    mainClass.set("memo1.ejercicio1.Main")
 }
 
 tasks.register<Test>("cucumberTest") {
