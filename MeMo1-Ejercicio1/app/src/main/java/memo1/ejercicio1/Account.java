@@ -65,8 +65,8 @@ public class Account {
             return false;
         }
 
-        balance -= amount;
         receiver.setBalance(receiver.balance + amount);
+        balance -= amount;
 
         return true;
     }
