@@ -72,4 +72,56 @@ class AccountTest {
         assertTrue(account.withdraw(100.0));
         assertEquals(0.0, account.getBalance());
     }
+
+    @Test
+    void transferShouldThrowExceptionIfTargetAccountIsNull() {
+        Account account = new Account(100.0);
+        assertThrows(IllegalArgumentException.class, () -> account.transfer(null, 100.0));
+    }
+
+    @Test
+    void transferShouldReturnFalseIfTargetAccountIsTheSameAsSender() {
+        Account account = new Account(123L, 100.0);
+        assertFalse(account.transfer(account, 100.0));
+        assertFalse(account.transfer(new Account(account.getCbu(), 100.0), 100.0));
+    }
+
+    @Test
+    void transferShouldReturnFalseIfAmountIsNegative() {
+        Account account = new Account(123L, 100.0);
+        assertFalse(account.transfer(new Account(), -100.0));
+    }
+
+    @Test
+    void transferShouldDecreaseBalanceFromSenderAccount() {
+        Account account = new Account(123L, 100.0);
+        account.transfer(new Account(), 30.0);
+
+        assertEquals(account.getBalance(), 70.0);
+    }
+
+    @Test
+    void transferShouldIncreaseBalanceFromTargetAccount() {
+        Account account = new Account(123L, 100.0);
+        Account receiver = new Account(456L, 0.0);
+
+        account.transfer(receiver, 30.0);
+        assertEquals(receiver.getBalance(), 30.0);
+
+        account.transfer(receiver, 20.0);
+        assertEquals(receiver.getBalance(), 50.0);
+    }
+
+    @Test
+    void transferShouldReturnFalseWhenTheAmountExceedsTheSenderAccountBalance() {
+        Account account = new Account(123L, 100.0);
+        assertFalse(account.transfer(new Account(), 2000.0));
+    }
+
+    @Test
+    void transferShouldAllowExactAmount() {
+        Account account = new Account(123L, 100.0);
+        assertTrue(account.transfer(new Account(), account.getBalance()));
+        assertEquals(account.getBalance(), 0.0);
+    }
 }

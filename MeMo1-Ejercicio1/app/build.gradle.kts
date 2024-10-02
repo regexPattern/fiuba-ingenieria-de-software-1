@@ -24,7 +24,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("memo1.ejercicio1.App")
+    mainClass.set("memo1.ejercicio1.Main")
 }
 
 tasks.register<Test>("cucumberTest") {
@@ -33,8 +33,8 @@ tasks.register<Test>("cucumberTest") {
     include("**/RunCucumberTest*")
 
     testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
+        events("failed")
+        showStandardStreams = false
     }
 }
 
@@ -42,7 +42,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 
     testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
+        events("failed")
+        showStandardStreams = false
     }
 }
