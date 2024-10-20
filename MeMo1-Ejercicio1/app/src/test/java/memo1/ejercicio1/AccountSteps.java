@@ -1,10 +1,15 @@
 package memo1.ejercicio1;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+
 import io.cucumber.java.en.*;
 
 public class AccountSteps {
     private Account account;
+    private AccountRegistry accountRegistry;
+
     private Exception operationResult;
 
     @Given("I create an account with CBU {long} and alias {string}")
@@ -60,6 +65,11 @@ public class AccountSteps {
         }
     }
 
+    @And("The account CBU should be {long}")
+    public void verifyAccountCbu(Long cbu) {
+        assertEquals(account.getCbu(), cbu);
+    }
+
     @And("The account alias should be {string}")
     public void verifyAccountAlias(String alias) {
         assertEquals(account.getAlias(), alias);
@@ -70,18 +80,37 @@ public class AccountSteps {
         assertEquals(balance, account.getBalance(), 0.01);
     }
 
-    @Then("The operation should be denied")
-    public void verifyOperationDenied() {
-        assertNotNull(operationResult);
-    }
-
     @Then("The account balance should remain {double}")
     public void verifyBalanceRemains(double expectedBalance) {
         assertEquals(expectedBalance, account.getBalance(), 0.01);
     }
 
-    @Then("The operation should be denied due to insufficient funds")
-    public void verifyInsufficientFunds() {
+    @Then("The operation should be denied")
+    public void verifyOperationDenied() {
         assertNotNull(operationResult);
+    }
+
+    @Given("An account with CBU {long} and alias {string}")
+    public void createAccountWithCbuAndAlias(Long cbu, String alias) {
+        accountRegistry = new AccountRegistry();
+        account = new Account(cbu, alias);
+        accountRegistry.registerAccount(account);
+    }
+
+    @When("I try to create an account with CBU {long} and alias {string}")
+    public void tryToCreateAnotherAccountWithCbuAndAlias(Long cbu, String alias) {
+        try {
+            accountRegistry.registerAccount(new Account(cbu, alias));
+        } catch (Exception exception) {
+            operationResult = exception;
+        }
+    }
+
+    @And("The second account should not be registered")
+    public void verifyOnlyOneAccountRegistered() {
+        ArrayList<Account> registeredAccounts = accountRegistry.getRegisteredAccounts();
+
+        assertEquals(registeredAccounts.size(), 1);
+        assertEquals(registeredAccounts.get(0), account);
     }
 }

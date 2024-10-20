@@ -62,7 +62,7 @@ public class ClientSteps {
 	public void createClientWithDniOnly(Long dni, String name, String surName) {
 		clientRegistry = new ClientRegistry();
 		client = new Client(dni, name, surName);
-		clientRegistry.signUp(client);
+		clientRegistry.signUpClient(client);
 	}
 
 	@And("A person who wants to become a client and has DNI {long}, name {string} and surname {string}")
@@ -76,7 +76,7 @@ public class ClientSteps {
 	public void tryToSignUpPersonWithAlreadyTakenDni() {
 		Client newClient = new Client(personDni, personName, personSurName);
 		try {
-			clientRegistry.signUp(newClient);
+			clientRegistry.signUpClient(newClient);
 		} catch (Exception exception) {
 			operationResult = exception;
 		}
