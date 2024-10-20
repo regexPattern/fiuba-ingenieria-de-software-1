@@ -5,52 +5,74 @@ import io.cucumber.java.en.*;
 
 public class AccountSteps {
     private Account account;
-    private boolean operationResult;
+    private Exception operationResult;
 
-    @Given("I create an account with CBU {long}")
-    public void createAccountWithDefaultBalance(long cbu) {
-        account = new Account();
-        account.setCbu(cbu);
+    @Given("I create an account with CBU {long} and alias {string}")
+    public void createAccountWithDefaultBalance(long cbu, String alias) {
+        account = new Account(cbu, alias);
     }
 
-    @Given("I create an account with CBU {long} and a balance of {double}")
-    public void createAccountWithInitialBalance(long cbu, double balance) {
-        account = new Account(cbu, balance);
-    }
-
-    @Given("An account with CBU {long} and a balance of {double}")
-    public void anAccountWithCBUAndBalance(long cbu, double balance) {
-        account = new Account(cbu, balance);
+    @Given("I create an account with CBU {long}, alias {string} and a balance of {double}")
+    @Given("An account with CBU {long}, alias {string} and a balance of {double}")
+    public void createAccountWithInitialBalance(long cbu, String alias, double balance) {
+        account = new Account(cbu, alias, balance);
     }
 
     @When("I deposit {double} into the account")
     public void depositIntoAccount(double amount) {
-        operationResult = account.deposit(amount);
+        try {
+            account.deposit(amount);
+        } catch (Exception exception) {
+            operationResult = exception;
+        }
     }
 
     @When("I try to deposit {double} into the account")
     public void tryToDepositIntoAccount(double amount) {
-        operationResult = account.deposit(amount);
+        operationResult = null;
+
+        try {
+            account.deposit(amount);
+        } catch (Exception exception) {
+            operationResult = exception;
+        }
     }
 
     @When("I withdraw {double} from the account")
     public void withdrawFromAccount(double amount) {
-        operationResult = account.withdraw(amount);
+        operationResult = null;
+
+        try {
+            account.withdraw(amount);
+        } catch (Exception exception) {
+            operationResult = exception;
+        }
     }
 
     @When("I try to withdraw {double} from the account")
     public void tryToWithdrawFromAccount(double amount) {
-        operationResult = account.withdraw(amount);
+        operationResult = null;
+
+        try {
+            account.withdraw(amount);
+        } catch (Exception exception) {
+            operationResult = exception;
+        }
     }
 
-    @Then("The account balance should be {double}")
-    public void verifyAccountBalance(double expectedBalance) {
-        assertEquals(expectedBalance, account.getBalance(), 0.01);
+    @And("The account alias should be {string}")
+    public void verifyAccountAlias(String alias) {
+        assertEquals(account.getAlias(), alias);
+    }
+
+    @And("The account balance should be {double}")
+    public void verifyAccountBalance(double balance) {
+        assertEquals(balance, account.getBalance(), 0.01);
     }
 
     @Then("The operation should be denied")
     public void verifyOperationDenied() {
-        assertFalse(operationResult);
+        assertNotNull(operationResult);
     }
 
     @Then("The account balance should remain {double}")
@@ -60,6 +82,6 @@ public class AccountSteps {
 
     @Then("The operation should be denied due to insufficient funds")
     public void verifyInsufficientFunds() {
-        assertFalse(operationResult);
+        assertNotNull(operationResult);
     }
 }

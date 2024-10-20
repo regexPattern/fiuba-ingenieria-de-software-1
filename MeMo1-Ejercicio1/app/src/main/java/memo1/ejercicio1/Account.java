@@ -2,25 +2,17 @@ package memo1.ejercicio1;
 
 public class Account {
     private Long cbu;
+    private String alias;
     private double balance;
 
-    public Account() {
-        this.balance = 0.0;
-    }
-
-    public Account(double balance) {
-        if (balance < 0) {
-            throw new IllegalArgumentException("Balance cannot be negative.");
-        }
-        this.balance = balance;
-    }
-
-    public Account(Long cbu, double balance) {
-        if (balance < 0) {
-            throw new IllegalArgumentException("Balance cannot be negative.");
-        }
+    public Account(Long cbu, String alias) {
         this.cbu = cbu;
-        this.balance = balance;
+        this.alias = alias;
+    }
+
+    public Account(Long cbu, String alias, double balance) {
+        this(cbu, alias);
+        setBalance(balance);
     }
 
     public Long getCbu() {
@@ -31,6 +23,10 @@ public class Account {
         this.cbu = cbu;
     }
 
+    public String getAlias() {
+        return alias;
+    }
+
     public double getBalance() {
         return balance;
     }
@@ -39,35 +35,36 @@ public class Account {
         if (balance < 0) {
             throw new IllegalArgumentException("Balance cannot be negative.");
         }
+
         this.balance = balance;
     }
 
-    public boolean withdraw(double amount) {
-        if (amount <= 0 || amount > balance) {
-            return false;
+    public void withdraw(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount cannot be negative.");
+        } else if (amount > balance) {
+            throw new IllegalArgumentException("Not enough funds.");
         }
+
         balance -= amount;
-        return true;
     }
 
-    public boolean deposit(double amount) {
+    public void deposit(double amount) {
         if (amount < 0) {
-            return false;
+            throw new IllegalArgumentException("Amount has to be positive.");
         }
+
         balance += amount;
-        return true;
     }
 
-    public boolean transfer(Account receiver, double amount) {
+    public void transfer(Account receiver, double amount) {
         if (receiver == null) {
-            throw new IllegalArgumentException("Target account cannot be null.");
-        } else if (receiver.cbu == cbu || amount < 0 || balance - amount < 0) {
-            return false;
+            throw new IllegalArgumentException("Receiver account cannot be null.");
+        } else if (receiver.getCbu() == getCbu()) {
+            throw new IllegalArgumentException("Receiver account cannot be same as sender.");
         }
 
-        receiver.setBalance(receiver.balance + amount);
-        balance -= amount;
-
-        return true;
+        withdraw(amount);
+        receiver.deposit(amount);
     }
 }
