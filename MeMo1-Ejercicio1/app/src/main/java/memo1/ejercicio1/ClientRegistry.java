@@ -1,21 +1,22 @@
 package memo1.ejercicio1;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 
 public class ClientRegistry {
-	static private ArrayList<Client> clients = new ArrayList<>();
-	static private HashSet<Long> takenDnis = new HashSet<>();
+	private HashMap<Long, Client> signedUpClients = new HashMap<>();
 
 	public void signUpClient(Client client) {
-		if (!takenDnis.add(client.getDni())) {
-			throw new IllegalStateException("DNI already in use by another client.");
+		if (signedUpClients.putIfAbsent(client.getDni(), client) != null) {
+			throw new IllegalStateException("DNI is already in use by another client.");
 		}
-
-		clients.add(client);
 	}
 
-	public ArrayList<Client> getClients() {
-		return new ArrayList<>(clients);
+	public ArrayList<Client> getSignedUpClients() {
+		return new ArrayList<>(signedUpClients.values());
+	}
+
+	public Client removeClient(Long dni) {
+		return signedUpClients.remove(dni);
 	}
 }
