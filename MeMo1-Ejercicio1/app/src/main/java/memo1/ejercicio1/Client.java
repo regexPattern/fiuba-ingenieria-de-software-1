@@ -18,8 +18,7 @@ public class Client {
 		this.surName = surName;
 	}
 
-	public Client(Long dni, String name, String surName, String birthDateString, String address)
-			throws Exception {
+	public Client(Long dni, String name, String surName, String birthDateString, String address) {
 		this(dni, name, surName);
 		this.address = address;
 
@@ -27,6 +26,8 @@ public class Client {
 		if (birthDate.isAfter(LocalDate.now())) {
 			throw new IllegalArgumentException("Birthdate cannot be a future date.");
 		}
+
+		this.birthDate = birthDate;
 	}
 
 	public Long getDni() {

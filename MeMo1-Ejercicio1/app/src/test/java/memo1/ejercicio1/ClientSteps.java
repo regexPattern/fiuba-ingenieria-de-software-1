@@ -1,9 +1,11 @@
 package memo1.ejercicio1;
 
 import static org.junit.Assert.*;
-import io.cucumber.java.en.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.time.LocalDate;
+
+import io.cucumber.java.en.*;
 
 public class ClientSteps {
 	private Long personDni;
@@ -13,6 +15,8 @@ public class ClientSteps {
 	private String personAddress;
 
 	private Client client;
+	private ClientRegistry clientRegistry;
+	private Exception operationResult;
 
 	@Given("A person with DNI {long}, name {string}, surname {string}, birthdate {string} and address {string}")
 	public void createPerson(Long dni, String name, String surName, String birthDateString, String address) {
@@ -25,10 +29,7 @@ public class ClientSteps {
 
 	@When("I sign-up the person as a client")
 	public void signUpPersonAsClient() {
-		try {
-			client = new Client(personDni, personName, personSurName, personBirthDateString, personAddress);
-		} catch (Exception exception) {
-		}
+		client = new Client(personDni, personName, personSurName, personBirthDateString, personAddress);
 	}
 
 	@Then("The client DNI should be {long}")
@@ -53,7 +54,36 @@ public class ClientSteps {
 	}
 
 	@And("The client address should be {string}")
-	void verifyAddress(String address) {
+	public void verifyAddress(String address) {
 		assertEquals(client.getAddress(), address);
+	}
+
+	@Given("A client with DNI {long}, name {string} and surname {string}")
+	public void createClientWithDniOnly(Long dni, String name, String surName) {
+		clientRegistry = new ClientRegistry();
+		client = new Client(dni, name, surName);
+		clientRegistry.signUp(client);
+	}
+
+	@And("A person who wants to become a client and has DNI {long}, name {string} and surname {string}")
+	public void createPersonWithAlreadyTakenDni(Long dni, String name, String surName) {
+		personDni = dni;
+		personName = name;
+		personSurName = surName;
+	}
+
+	@When("I try to sign-up the second person as a client")
+	public void tryToSignUpPersonWithAlreadyTakenDni() {
+		Client newClient = new Client(personDni, personName, personSurName);
+		try {
+			clientRegistry.signUp(newClient);
+		} catch (Exception exception) {
+			operationResult = exception;
+		}
+	}
+
+	@Then("The client sign-up operation should be denied")
+	public void verifyOperation() {
+		assertNotNull(operationResult);
 	}
 }
