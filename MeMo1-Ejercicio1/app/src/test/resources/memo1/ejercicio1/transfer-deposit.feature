@@ -9,3 +9,4 @@ Feature: Depositing money
     When I try to deposit -100.0 into the account
     Then The operation should be denied
     And The account balance should remain 1000.0
+    And The transfer should not be logged

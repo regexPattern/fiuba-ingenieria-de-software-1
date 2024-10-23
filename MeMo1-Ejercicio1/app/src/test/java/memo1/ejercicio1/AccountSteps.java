@@ -3,6 +3,7 @@ package memo1.ejercicio1;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import io.cucumber.java.en.*;
 
@@ -11,6 +12,7 @@ public class AccountSteps {
     private AccountRegistry accountRegistry;
 
     private Exception operationResult;
+	private TransferLog transferLog;
 
     @Given("I create an account with CBU {long} and alias {string}")
     public void createAccountWithDefaultBalance(long cbu, String alias) {
@@ -25,8 +27,11 @@ public class AccountSteps {
 
     @When("I deposit {double} into the account")
     public void depositIntoAccount(double amount) {
+        operationResult = null;
+        transferLog = null;
+
         try {
-            account.deposit(amount);
+            transferLog = account.deposit(amount);
         } catch (Exception exception) {
             operationResult = exception;
         }
@@ -35,9 +40,10 @@ public class AccountSteps {
     @When("I try to deposit {double} into the account")
     public void tryToDepositIntoAccount(double amount) {
         operationResult = null;
+        transferLog = null;
 
         try {
-            account.deposit(amount);
+            transferLog = account.deposit(amount);
         } catch (Exception exception) {
             operationResult = exception;
         }
@@ -46,9 +52,10 @@ public class AccountSteps {
     @When("I withdraw {double} from the account")
     public void withdrawFromAccount(double amount) {
         operationResult = null;
+        transferLog = null;
 
         try {
-            account.withdraw(amount);
+            transferLog = account.withdraw(amount);
         } catch (Exception exception) {
             operationResult = exception;
         }
@@ -57,9 +64,10 @@ public class AccountSteps {
     @When("I try to withdraw {double} from the account")
     public void tryToWithdrawFromAccount(double amount) {
         operationResult = null;
+        transferLog = null;
 
         try {
-            account.withdraw(amount);
+            transferLog = account.withdraw(amount);
         } catch (Exception exception) {
             operationResult = exception;
         }
@@ -89,6 +97,15 @@ public class AccountSteps {
     public void verifyOperationDenied() {
         assertNotNull(operationResult);
     }
+
+    @And("The log should be associated with the given accounts")
+	public void verifyTwoAssociatedAccounts() {
+		HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+
+		assertEquals(associatedAccountsCbus.size(), 2);
+		assertTrue(associatedAccountsCbus.contains(sender.getCbu()));
+		assertTrue(associatedAccountsCbus.contains(receiver.getCbu()));
+	}
 
     @Given("An account with CBU {long} and alias {string}")
     public void createAccountWithCbuAndAlias(Long cbu, String alias) {

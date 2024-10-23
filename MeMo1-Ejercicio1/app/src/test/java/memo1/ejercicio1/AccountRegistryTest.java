@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 class AccountRegistryTest {
 	@Test
 	void anAccountRegistryIsCreatedWithNoAccounts() {
-		AccountRegistry registry = new AccountRegistry();
+		AccountRegistry accountRegistry = new AccountRegistry();
 
-		assertEquals(registry.getRegisteredAccounts().size(), 0);
+		assertEquals(accountRegistry.getRegisteredAccounts().size(), 0);
 	}
 }

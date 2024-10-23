@@ -1,5 +1,7 @@
 package memo1.ejercicio1;
 
+import memo1.ejercicio1.TransferLog.TransferType;
+
 public class Account {
     private Long cbu;
     private String alias;
@@ -39,7 +41,7 @@ public class Account {
         this.balance = balance;
     }
 
-    public void withdraw(double amount) {
+    public TransferLog withdraw(double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount cannot be negative.");
         } else if (amount > balance) {
@@ -47,17 +49,21 @@ public class Account {
         }
 
         balance -= amount;
+
+        return new TransferLog(TransferType.Transfer, amount, this);
     }
 
-    public void deposit(double amount) {
+    public TransferLog deposit(double amount) {
         if (amount < 0) {
             throw new IllegalArgumentException("Amount has to be positive.");
         }
 
         balance += amount;
+
+        return new TransferLog(TransferType.Deposit, amount, this);
     }
 
-    public void transfer(Account receiver, double amount) {
+    public TransferLog transfer(Account receiver, double amount) {
         if (receiver == null) {
             throw new IllegalArgumentException("Receiver account cannot be null.");
         } else if (receiver.getCbu() == getCbu()) {
@@ -66,5 +72,7 @@ public class Account {
 
         withdraw(amount);
         receiver.deposit(amount);
+
+        return new TransferLog(TransferType.Transfer, amount, this, receiver);
     }
 }

@@ -4,15 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class AccountRegistry {
-	private ArrayList<Account> registeredAccounts;
-	private HashSet<Long> takenCbus;
-	private HashSet<String> takenAliases;
-
-	public AccountRegistry() {
-		registeredAccounts = new ArrayList<>();
-		takenCbus = new HashSet<>();
-		takenAliases = new HashSet<>();
-	}
+	private ArrayList<Account> registeredAccounts = new ArrayList<>();;
+	private HashSet<Long> takenCbus = new HashSet<>();
+	private HashSet<String> takenAliases = new HashSet<>();
 
 	public void registerAccount(Account account) {
 		if (takenCbus.contains(account.getCbu())) {
