@@ -35,8 +35,6 @@ public class TransferSteps {
 	}
 
 	@Then("The transfer should be logged")
-	@Then("The deposit should be logged")
-	@Then("The withdrawal should be logged")
 	public void verifyTransferLogged() {
 		assertNotNull(transferLog);
 	}
@@ -73,36 +71,37 @@ public class TransferSteps {
 		receiver = sender;
 	}
 
-	@And("The log should have a correlative code")
+	@And("The transfer log should have a correlative code")
 	public void verifyLogHasCorrelativeCode() {
 		assertNotNull(transferLog.getCorrelativeCode());
 	}
 
-	@And("The log should have a date")
+	@And("The transfer log should have a date")
 	public void verifyLogHasDate() {
 		assertNotNull(transferLog.getDate());
 	}
 
-	@And("The log should have a time")
+	@And("The transfer log should have a time")
 	public void verifyLogHasTime() {
 		assertNotNull(transferLog.getTime());
 	}
 
-    @And("The logged type should be {string}")
+    @And("The logged transfer type should be {string}")
 	public void verifyLogType(String type) {
 		assertEquals(transferLog.getType(), type);
 	}
 
-	@And("And The logged amount should be {double}")
+	@And("The logged transfered amount should be {double}")
 	public void verifyLoggedAmount(Double amount) {
 		assertEquals(transferLog.getAmount(), amount);
 	}
 
-    @And("The log should be associated with the given account")
-	public void verifyOneAssociatedAccount() {
+    @And("The transfer log should be associated with the given accounts")
+	public void verifyTwoAssociatedAccounts() {
 		HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
 
-		assertEquals(associatedAccountsCbus.size(), 1);
+		assertEquals(associatedAccountsCbus.size(), 2);
 		assertTrue(associatedAccountsCbus.contains(sender.getCbu()));
+		assertTrue(associatedAccountsCbus.contains(receiver.getCbu()));
 	}
 }

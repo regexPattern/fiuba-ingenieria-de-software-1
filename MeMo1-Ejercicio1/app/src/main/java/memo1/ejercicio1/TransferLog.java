@@ -7,28 +7,25 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public class TransferLog {
-	public enum TransferType {
-		Transfer,
-		Deposit,
-		Withdrawal
-	}
-
 	private UUID correlativeCode;
-	private TransferType type;
+	private String type;
 	private Double amount;
 	private LocalDateTime dateTime;
 	private HashSet<Long> associatedAccountsCbus = new HashSet<>();
 
-	private TransferLog(TransferType type, Double amount) {
+	private TransferLog(String type, Double amount) {
+		this.type = type;
+		this.amount = amount;
 		this.correlativeCode = UUID.randomUUID();
 		this.dateTime = LocalDateTime.now();
 	}
 
-	public TransferLog(TransferType type, Double amount, Account account) {
+	public TransferLog(String type, Double amount, Account account) {
+		this(type, amount);
 		this.associatedAccountsCbus.add(account.getCbu());
 	}
 
-	public TransferLog(TransferType type, Double amount, Account sender, Account receiver) {
+	public TransferLog(String type, Double amount, Account sender, Account receiver) {
 		this(type, amount);
 		this.associatedAccountsCbus.add(sender.getCbu());
 		this.associatedAccountsCbus.add(receiver.getCbu());
@@ -47,13 +44,7 @@ public class TransferLog {
 	}
 
 	public String getType() {
-		switch (type) {
-			case Transfer: return "transfer";
-			case Deposit: return "deposit";
-			case Withdrawal: return "withdrawal";
-		}
-
-		return null;
+		return type;
 	}
 
 	public Double getAmount() {

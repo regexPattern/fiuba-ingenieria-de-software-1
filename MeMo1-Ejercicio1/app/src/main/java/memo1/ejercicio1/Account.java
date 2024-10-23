@@ -1,7 +1,5 @@
 package memo1.ejercicio1;
 
-import memo1.ejercicio1.TransferLog.TransferType;
-
 public class Account {
     private Long cbu;
     private String alias;
@@ -50,7 +48,7 @@ public class Account {
 
         balance -= amount;
 
-        return new TransferLog(TransferType.Transfer, amount, this);
+        return new TransferLog("withdrawal", amount, this);
     }
 
     public TransferLog deposit(double amount) {
@@ -60,7 +58,7 @@ public class Account {
 
         balance += amount;
 
-        return new TransferLog(TransferType.Deposit, amount, this);
+        return new TransferLog("deposit", amount, this);
     }
 
     public TransferLog transfer(Account receiver, double amount) {
@@ -73,6 +71,6 @@ public class Account {
         withdraw(amount);
         receiver.deposit(amount);
 
-        return new TransferLog(TransferType.Transfer, amount, this, receiver);
+        return new TransferLog("transfer", amount, this, receiver);
     }
 }
