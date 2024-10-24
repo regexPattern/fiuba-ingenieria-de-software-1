@@ -24,7 +24,7 @@ public class Client {
 
 		LocalDate birthDate = LocalDate.parse(birthDateString, dateFormatter);
 		if (birthDate.isAfter(LocalDate.now())) {
-			throw new IllegalArgumentException("Birthdate cannot be a future date.");
+			throw new IllegalArgumentException("Birth date cannot be a future date.");
 		}
 
 		this.birthDate = birthDate;

@@ -11,19 +11,19 @@ class ClientRegistryTest {
 	void aClientRegistryIsCreatedWithNoClients() {
 		ClientRegistry clientRegistry = new ClientRegistry();
 
-		assertEquals(clientRegistry.getSignedUpClients().size(), 0);
+		assertEquals(clientRegistry.getRegisteredClients().size(), 0);
 	}
 
 	@Test
-	void signInUpClientsToAClientRegistry() {
+	void registerClientsToAClientRegistry() {
 		ClientRegistry clientRegistry = new ClientRegistry();
 		Client client1 = new Client(123456789L, "Carlos", "Castillo");
 		Client client2 = new Client(987654321L, "Eduardo", "Pereira");
 
-		clientRegistry.signUpClient(client1);
-		clientRegistry.signUpClient(client2);
+		clientRegistry.registerClient(client1);
+		clientRegistry.registerClient(client2);
 
-		ArrayList<Client> registeredClients = clientRegistry.getSignedUpClients();
+		ArrayList<Client> registeredClients = clientRegistry.getRegisteredClients();
 
 		assertEquals(registeredClients.size(), 2);
 		assertTrue(registeredClients.contains(client1));
@@ -35,9 +35,9 @@ class ClientRegistryTest {
 		ClientRegistry clientRegistry = new ClientRegistry();
 		Long dni = 987654321L;
 
-		clientRegistry.signUpClient(new Client(123456789L, "Carlos", "Castillo"));
+		clientRegistry.registerClient(new Client(123456789L, "Carlos", "Castillo"));
 
-		assertNull(clientRegistry.removeClient(dni));
+		assertNull(clientRegistry.unregisterClient(dni));
 	}
 
 	@Test
@@ -45,10 +45,10 @@ class ClientRegistryTest {
 		ClientRegistry clientRegistry = new ClientRegistry();
 		Client client = new Client(123456789L, "Carlos", "Castillo");
 
-		clientRegistry.signUpClient(client);
+		clientRegistry.registerClient(client);
 
-		assertEquals(clientRegistry.removeClient(client.getDni()), client);
-		assertEquals(clientRegistry.getSignedUpClients().size(), 0);
+		assertEquals(clientRegistry.unregisterClient(client.getDni()), client);
+		assertEquals(clientRegistry.getRegisteredClients().size(), 0);
 	}
 
 	@Test
@@ -56,16 +56,16 @@ class ClientRegistryTest {
 		ClientRegistry clientRegistry = new ClientRegistry();
 		Client client = new Client(123456789L, "Carlos", "Castillo");
 
-		clientRegistry.signUpClient(client);
+		clientRegistry.registerClient(client);
 
-		assertEquals(clientRegistry.getSignedUpClients().get(0), client);
+		assertEquals(clientRegistry.getRegisteredClients().get(0), client);
 
-		clientRegistry.removeClient(client.getDni());
+		clientRegistry.unregisterClient(client.getDni());
 
-		assertEquals(clientRegistry.getSignedUpClients().size(), 0);
+		assertEquals(clientRegistry.getRegisteredClients().size(), 0);
 
-		clientRegistry.signUpClient(client);
+		clientRegistry.registerClient(client);
 
-		assertEquals(clientRegistry.getSignedUpClients().get(0), client);
+		assertEquals(clientRegistry.getRegisteredClients().get(0), client);
 	}
 }

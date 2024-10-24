@@ -8,28 +8,13 @@ import java.time.LocalDate;
 import io.cucumber.java.en.*;
 
 public class ClientSteps {
-	private Long personDni;
-	private String personName;
-	private String personSurName;
-	private String personBirthDateString;
-	private String personAddress;
-
 	private Client client;
 	private ClientRegistry clientRegistry;
 	private Exception operationResult;
 
-	@Given("A person with DNI {long}, name {string}, surname {string}, birthdate {string} and address {string}")
+	@Given("I create a client with DNI {long}, name {string}, surname {string}, birth date {string} and address {string}")
 	public void createPerson(Long dni, String name, String surName, String birthDateString, String address) {
-		personDni = dni;
-		personName = name;
-		personSurName = surName;
-		personBirthDateString = birthDateString;
-		personAddress = address;
-	}
-
-	@When("I sign-up the person as a client")
-	public void signUpPersonAsClient() {
-		client = new Client(personDni, personName, personSurName, personBirthDateString, personAddress);
+		client = new Client(dni, name, surName, birthDateString, address);
 	}
 
 	@Then("The client DNI should be {long}")
@@ -47,7 +32,7 @@ public class ClientSteps {
 		assertEquals(client.getSurName(), surName);
 	}
 
-	@And("The client birthdate should be {string}")
+	@And("The client birth date should be {string}")
 	public void verifyBirthDate(String birthDateString) {
 		LocalDate birthDate = LocalDate.parse(birthDateString, Client.dateFormatter);
 		assertEquals(client.getBirthDate(), birthDate);
@@ -62,27 +47,20 @@ public class ClientSteps {
 	public void createClientWithDniOnly(Long dni, String name, String surName) {
 		clientRegistry = new ClientRegistry();
 		client = new Client(dni, name, surName);
-		clientRegistry.signUpClient(client);
+		clientRegistry.registerClient(client);
 	}
 
-	@And("A person who wants to become a client and has DNI {long}, name {string} and surname {string}")
+	@When("I try to create another client with DNI {long}, name {string} and surname {string}")
 	public void createPersonWithAlreadyTakenDni(Long dni, String name, String surName) {
-		personDni = dni;
-		personName = name;
-		personSurName = surName;
-	}
-
-	@When("I try to sign-up the second person as a client")
-	public void tryToSignUpPersonWithAlreadyTakenDni() {
-		Client newClient = new Client(personDni, personName, personSurName);
+		Client newClient = new Client(dni, name, surName);
 		try {
-			clientRegistry.signUpClient(newClient);
+			clientRegistry.registerClient(newClient);
 		} catch (Exception exception) {
 			operationResult = exception;
 		}
 	}
 
-	@Then("The client sign-up operation should be denied")
+	@Then("The client register operation should be denied")
 	public void verifyOperation() {
 		assertNotNull(operationResult);
 	}

@@ -1,5 +1,7 @@
 package memo1.ejercicio1;
 
+import java.util.Objects;
+
 public class Account {
     private Long cbu;
     private String alias;
@@ -72,5 +74,22 @@ public class Account {
         receiver.deposit(amount);
 
         return new TransferLog("transfer", amount, this, receiver);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cbu, alias);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        Account otherAccount = (Account) obj;
+        return Objects.equals(getCbu(), otherAccount.getCbu()) && Objects.equals(getAlias(), otherAccount.getAlias());
     }
 }

@@ -2,6 +2,8 @@ package memo1.ejercicio1;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashSet;
+
 import org.junit.jupiter.api.Test;
 
 class AccountTest {
@@ -173,6 +175,60 @@ class AccountTest {
 
         assertDoesNotThrow(() -> sender.transfer(receiver, sender.getBalance()));
         assertEquals(sender.getBalance(), 0.0);
+    }
+
+    @Test
+    void withdrawingFromAnAccountLogsTheWithdrawal() {
+        Account account = new Account(123456789L, "account", 200.0);
+
+        TransferLog transferLog = account.withdraw(10.0);
+
+        assertEquals(transferLog.getType(), "withdrawal");
+        assertEquals(transferLog.getAmount(), 10.0);
+
+        HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+
+        assertEquals(associatedAccountsCbus.size(), 1);
+        assertTrue(associatedAccountsCbus.contains(account.getCbu()));
+    }
+
+    @Test
+    void depositingIntoAnAccountLogsTheDeposit() {
+        Account account = new Account(123456789L, "account", 200.0);
+
+        TransferLog transferLog = account.deposit(10.0);
+
+        assertEquals(transferLog.getType(), "deposit");
+        assertEquals(transferLog.getAmount(), 10.0);
+
+        HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+
+        assertEquals(associatedAccountsCbus.size(), 1);
+        assertTrue(associatedAccountsCbus.contains(account.getCbu()));
+    }
+
+    @Test
+    void transferingBetweenAccountsLogsTheTransfer() {
+        Account sender = new Account(123456789L, "sender", 200.0);
+        Account receiver = new Account(987654321L, "receiver", 0.0);
+
+        TransferLog transferLog = sender.transfer(receiver, 10.0);
+
+        assertEquals(transferLog.getType(), "transfer");
+        assertEquals(transferLog.getAmount(), 10.0);
+
+        HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+
+        assertEquals(associatedAccountsCbus.size(), 2);
+        assertTrue(associatedAccountsCbus.contains(sender.getCbu()));
+        assertTrue(associatedAccountsCbus.contains(receiver.getCbu()));
+    }
+
+    @Test
+    void comparingTwoAccountsForEquality() {
+        assertEquals(new Account(123456789L, "alias"), new Account(123456789L, "alias"));
+        assertNotEquals(new Account(123456789L, "account1"), new Account(123456789L, "account2"));
+        assertNotEquals(new Account(123456789L, "account"), new Account(987654321L, "account"));
     }
 
     private Account dummyAccount() {

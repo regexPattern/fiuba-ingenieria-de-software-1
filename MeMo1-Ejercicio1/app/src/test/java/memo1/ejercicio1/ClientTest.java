@@ -44,6 +44,6 @@ class ClientTest {
         Exception exception = assertThrows(IllegalArgumentException.class,
                 () -> new Client(0L, "", "", futureDateString, ""));
 
-        assertEquals(exception.getMessage(), "Birthdate cannot be a future date.");
+        assertEquals(exception.getMessage(), "Birth date cannot be a future date.");
     }
 }

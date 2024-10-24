@@ -14,6 +14,11 @@ public class TransferLog {
 	private HashSet<Long> associatedAccountsCbus = new HashSet<>();
 
 	private TransferLog(String type, Double amount) {
+		if (!(type == "transfer" || type == "deposit" || type == "withdrawal")) {
+			throw new IllegalArgumentException(
+					"Unsupported transfer type (supported types: 'transfer', 'deposit', 'withdrawal')");
+		}
+
 		this.type = type;
 		this.amount = amount;
 		this.correlativeCode = UUID.randomUUID();
