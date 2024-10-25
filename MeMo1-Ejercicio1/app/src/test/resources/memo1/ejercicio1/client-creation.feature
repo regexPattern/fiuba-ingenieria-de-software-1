@@ -9,5 +9,5 @@ Feature: Create a client
 
   Scenario: Cannot create a client with an already-taken DNI
     Given A client with DNI 123456789, name "Carlos" and surname "Castillo"
-    When I try to create another client with DNI 123456789, name "Eduardo" and surname "Pereira"
+    When I try to register another client with DNI 123456789, name "Eduardo" and surname "Pereira"
     Then The client register operation should be denied

@@ -1,7 +1,6 @@
 package memo1.ejercicio1;
 
 import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.time.LocalDate;
 
@@ -50,7 +49,7 @@ public class ClientSteps {
 		clientRegistry.registerClient(client);
 	}
 
-	@When("I try to create another client with DNI {long}, name {string} and surname {string}")
+	@When("I try to register another client with DNI {long}, name {string} and surname {string}")
 	public void createPersonWithAlreadyTakenDni(Long dni, String name, String surName) {
 		Client newClient = new Client(dni, name, surName);
 		try {

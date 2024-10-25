@@ -31,7 +31,7 @@ class ClientRegistryTest {
 	}
 
 	@Test
-	void tryingToRemoveAClientThatIsNotYetRegisteredReturnsNull() {
+	void tryingToUnregisterAClientThatIsNotYetRegisteredReturnsNull() {
 		ClientRegistry clientRegistry = new ClientRegistry();
 		Long dni = 987654321L;
 
@@ -41,7 +41,7 @@ class ClientRegistryTest {
 	}
 
 	@Test
-	void removingAClientFromAClientRegistryReturnsTheClient() {
+	void unregisteringAClientFromAClientRegistryReturnsTheClient() {
 		ClientRegistry clientRegistry = new ClientRegistry();
 		Client client = new Client(123456789L, "Carlos", "Castillo");
 
@@ -52,7 +52,7 @@ class ClientRegistryTest {
 	}
 
 	@Test
-	void anAccountCanBeAddedBackToAClientRegistryAfterBeingRemoved() {
+	void anAccountCanBeAddedBackToAClientRegistryAfterBeingUnregistered() {
 		ClientRegistry clientRegistry = new ClientRegistry();
 		Client client = new Client(123456789L, "Carlos", "Castillo");
 

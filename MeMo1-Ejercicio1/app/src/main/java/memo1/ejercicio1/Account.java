@@ -1,11 +1,14 @@
 package memo1.ejercicio1;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Account {
     private Long cbu;
     private String alias;
     private double balance;
+    private Client owner;
+    private ArrayList<Client> coOwners = new ArrayList<>();
 
     public Account(Long cbu, String alias) {
         this.cbu = cbu;
