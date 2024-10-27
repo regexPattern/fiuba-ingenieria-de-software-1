@@ -81,6 +81,10 @@ public class Account {
     }
 
     public void setOwner(Client client) {
+        if (owner != null) {
+            throw new IllegalStateException("Cannot assign multiple owners");
+        }
+
         owner = client;
     }
 
@@ -89,6 +93,10 @@ public class Account {
     }
 
     public void setCoOwner(Client client) {
+        if (client == owner) {
+            throw new IllegalStateException("Account owner cannot be set as co-owner");
+        }
+
         coOwners.add(client);
     }
 
