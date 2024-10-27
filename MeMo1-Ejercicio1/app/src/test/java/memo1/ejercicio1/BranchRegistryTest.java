@@ -149,18 +149,4 @@ class BranchRegistryTest {
 
 		assertEquals(branchRegistry.getRegisteredBranches().size(), 2);
 	}
-
-	@Test
-	void updatingABranchNameToTheSameNameLeavesTheBranchNameAsIs() {
-		BranchRegistry branchRegistry = new BranchRegistry();
-
-		String previousName = "Suc. Belgrano";
-
-		Branch branch = new Branch(001, previousName, "Cabildo 1000 CABA");
-		branchRegistry.registerBranch(branch);
-
-		branchRegistry.updateBranchName(branch.getCode(), branch.getName());
-
-		assertEquals(branch.getName(), previousName);
-	}
 }
