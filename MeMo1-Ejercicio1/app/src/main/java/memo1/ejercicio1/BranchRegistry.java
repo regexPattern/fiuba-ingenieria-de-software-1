@@ -59,6 +59,8 @@ public class BranchRegistry {
 			registeredBranchNames.remove(branch.getName());
 			branch.setName(name);
 			registeredBranchNames.add(name);
+		} else {
+			throw new IllegalStateException("Name already in use by another branch.");
 		}
 
 		return true;
