@@ -2,6 +2,7 @@ package memo1.ejercicio1;
 
 import static org.junit.Assert.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import io.cucumber.java.en.*;
@@ -12,6 +13,7 @@ public class OwnershipSteps {
 	private Client coOwner;
 	private Exception operationResult;
 	private ArrayList<Client> prevCoOwners = new ArrayList<>();
+	private LocalDate marriageDate;
 
 	@Given("A registered account with CBU {long} and alias {string}")
 	public void createAccount(Long cbu, String alias) {
@@ -73,5 +75,16 @@ public class OwnershipSteps {
 	@And("The account co-owners should remain the same")
 	public void verifyCoOwnersRemain() {
 		assertEquals(account.getCoOwners(), prevCoOwners);
+	}
+
+	@And("A registered client with DNI {long}, name {string} and surname {string} who married the account owner on {string}")
+	public void createClientWhoIsWifeOfOwner(Long dni, String name, String surName, String marriageDateString) {
+		Client ownerWife = new Client(dni, name, surName);
+		marriageDate = ownerWife.setMarriedTo(owner, marriageDateString);
+	}
+
+	@Then("The marriage date should be {string}")
+	public void verifyMarriageDate(String marriageDateString) {
+		assertEquals(marriageDate, LocalDate.parse(marriageDateString, Client.dateFormatter));
 	}
 }

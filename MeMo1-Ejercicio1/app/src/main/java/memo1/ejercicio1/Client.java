@@ -9,6 +9,7 @@ public class Client {
 	private String surName;
 	private LocalDate birthDate;
 	private String address;
+	private Client partner;
 
 	static public DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -48,5 +49,13 @@ public class Client {
 
 	public String getAddress() {
 		return address;
+	}
+
+	public LocalDate setMarriedTo(Client client, String marriageDateString) {
+		LocalDate marriageDate = LocalDate.parse(marriageDateString, dateFormatter);
+
+		partner = client;
+
+		return marriageDate;
 	}
 }

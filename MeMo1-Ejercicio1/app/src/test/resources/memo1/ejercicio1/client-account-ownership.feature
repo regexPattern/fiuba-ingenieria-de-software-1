@@ -28,8 +28,9 @@ Feature: Client account ownership
     And The client with DNI 987654321 should remain as the account owner
     And The account co-owners should remain the same
 
-  # Scenario: Successfully label a co-owner who is married to the owner
-  #   Given An account with CBU 123456789 and alias "account"
-  #   And A client with DNI 987654321, name "Carlos" and surname "Castillo" who is the owner of the account
-  #   And A client with DNI 456789012, name "Lea" and surname "Seydoux" who is the wife of the account owner
-  #   When I assign the client with DNI 456789012 as one of the account co-owner
+  Scenario: Successfully label a co-owner who is married to the owner
+    Given A registered account with CBU 123456789 and alias "account"
+    And A registered client with DNI 987654321, name "Carlos" and surname "Castillo" who is the owner of the account
+    And A registered client with DNI 456789012, name "Lea" and surname "Seydoux" who married the account owner on "12/12/1999"
+    When I assign the client as one of the account co-owner
+    Then The marriage date should be "12/12/1999"
