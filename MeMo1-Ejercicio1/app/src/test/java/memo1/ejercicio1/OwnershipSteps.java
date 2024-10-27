@@ -57,8 +57,9 @@ public class OwnershipSteps {
 
 	@And("A registered client with DNI {long}, name {string} and surname {string} who is the owner of the account")
 	public void createClientAndSetAsOwner(Long dni, String name, String surName) {
-		Client owner = new Client(dni, name, surName);
-		account.setOwner(owner);
+		Client accountOwner = new Client(dni, name, surName);
+		account.setOwner(accountOwner);
+		owner = accountOwner;
 		coOwner = owner;
 	}
 
@@ -78,9 +79,9 @@ public class OwnershipSteps {
 	}
 
 	@And("A registered client with DNI {long}, name {string} and surname {string} who married the account owner on {string}")
-	public void createClientWhoIsWifeOfOwner(Long dni, String name, String surName, String marriageDateString) {
-		Client ownerWife = new Client(dni, name, surName);
-		marriageDate = ownerWife.setMarriedTo(owner, marriageDateString);
+	public void createClientWhoIsPartnerOfOwner(Long dni, String name, String surName, String marriageDateString) {
+		Client ownerPartner = new Client(dni, name, surName);
+		marriageDate = owner.setPartner(ownerPartner, marriageDateString);
 	}
 
 	@Then("The marriage date should be {string}")

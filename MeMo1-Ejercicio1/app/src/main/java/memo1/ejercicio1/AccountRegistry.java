@@ -9,13 +9,14 @@ public class AccountRegistry {
 	private HashMap<Long, Account> registeredAccountsByCbu = new HashMap<>();
 	private HashMap<String, Account> registeredAccountsByAlias = new HashMap<>();
 
-	public void registerAccount(Account account) {
+	public void registerAccount(Account account, Branch branch) {
 		if (registeredAccountsByCbu.containsKey(account.getCbu())) {
 			throw new IllegalStateException("There is an account already registerd with the same CBU.");
 		} else if (registeredAccountsByAlias.containsKey(account.getAlias())) {
 			throw new IllegalStateException("There is an account already registered with the same alias.");
 		}
 
+		account.setBranch(branch);
 		registeredAccounts.add(account);
 		registeredAccountsByCbu.put(account.getCbu(), account);
 		registeredAccountsByAlias.put(account.getAlias(), account);

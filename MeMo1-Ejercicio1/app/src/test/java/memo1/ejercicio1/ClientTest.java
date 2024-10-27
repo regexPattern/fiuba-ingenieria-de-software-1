@@ -46,4 +46,28 @@ class ClientTest {
 
         assertEquals(exception.getMessage(), "Birth date cannot be a future date.");
     }
+
+    @Test
+    void settingAClientAsMarriedToAnotherSetsBothClientsPartners() {
+        Client client1 = new Client(123456789L, "Carlos", "Castillo");
+        Client client2 = new Client(987654121L, "Lea", "Seydoux");
+
+        client1.setPartner(client2, "12/12/1999");
+
+        assertEquals(client1.getPartner(), client2);
+        assertEquals(client2.getPartner(), client1);
+    }
+
+    @Test
+    void settingAClientsPartnerReturnsTheMarriageDate() {
+        Client client1 = new Client(123456789L, "Carlos", "Castillo");
+        Client client2 = new Client(987654121L, "Lea", "Seydoux");
+
+        String marriageDateString = "12/12/1999";
+
+        LocalDate expectedMarriageDate = LocalDate.parse(marriageDateString, Client.dateFormatter);
+        LocalDate marriageDate = client1.setPartner(client2, marriageDateString);
+
+        assertEquals(marriageDate, expectedMarriageDate);
+    }
 }

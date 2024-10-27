@@ -51,11 +51,16 @@ public class Client {
 		return address;
 	}
 
-	public LocalDate setMarriedTo(Client client, String marriageDateString) {
+	public LocalDate setPartner(Client client, String marriageDateString) {
 		LocalDate marriageDate = LocalDate.parse(marriageDateString, dateFormatter);
 
 		partner = client;
+		client.partner = this;
 
 		return marriageDate;
+	}
+
+	public Client getPartner() {
+		return partner;
 	}
 }

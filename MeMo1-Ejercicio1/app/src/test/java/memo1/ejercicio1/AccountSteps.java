@@ -109,13 +109,13 @@ public class AccountSteps {
     public void createAccountWithCbuAndAlias(Long cbu, String alias) {
         accountRegistry = new AccountRegistry();
         account = new Account(cbu, alias);
-        accountRegistry.registerAccount(account);
+        accountRegistry.registerAccount(account, dummyBranch());
     }
 
     @When("I try to create an account with CBU {long} and alias {string}")
     public void tryToCreateAnotherAccountWithCbuAndAlias(Long cbu, String alias) {
         try {
-            accountRegistry.registerAccount(new Account(cbu, alias));
+            accountRegistry.registerAccount(new Account(cbu, alias), dummyBranch());
         } catch (Exception exception) {
             operationResult = exception;
         }
@@ -158,5 +158,9 @@ public class AccountSteps {
 	@And("The logged amount should be {double}")
 	public void verifyLoggedAmount(Double amount) {
 		assertEquals(transferLog.getAmount(), amount);
+	}
+
+	static private Branch dummyBranch() {
+		return new Branch(001, "Suc. Belgrano", "Cabildo 1000 CABA");
 	}
 }

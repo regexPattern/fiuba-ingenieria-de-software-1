@@ -10,6 +10,7 @@ public class Account {
     private double balance;
     private Client owner;
     private HashSet<Client> coOwners = new HashSet<>();
+    private Branch branch;
 
     public Account(Long cbu, String alias) {
         this.cbu = cbu;
@@ -82,7 +83,7 @@ public class Account {
 
     public void setOwner(Client client) {
         if (owner != null) {
-            throw new IllegalStateException("Cannot assign multiple owners");
+            throw new IllegalStateException("Cannot assign multiple owners.");
         }
 
         owner = client;
@@ -94,7 +95,7 @@ public class Account {
 
     public void setCoOwner(Client client) {
         if (client == owner) {
-            throw new IllegalStateException("Account owner cannot be set as co-owner");
+            throw new IllegalStateException("Account owner cannot be set as co-owner.");
         }
 
         coOwners.add(client);
@@ -102,6 +103,14 @@ public class Account {
 
     public ArrayList<Client> getCoOwners() {
         return new ArrayList<>(coOwners);
+    }
+
+    public void setBranch(Branch branch) {
+        this.branch = branch;
+    }
+
+    public Branch getBranch() {
+        return branch;
     }
 
     @Override
