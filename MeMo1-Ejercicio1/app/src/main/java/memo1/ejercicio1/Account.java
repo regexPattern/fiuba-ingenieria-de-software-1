@@ -1,6 +1,7 @@
 package memo1.ejercicio1;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
 
 public class Account {
@@ -8,7 +9,7 @@ public class Account {
     private String alias;
     private double balance;
     private Client owner;
-    private ArrayList<Client> coOwners = new ArrayList<>();
+    private HashSet<Client> coOwners = new HashSet<>();
 
     public Account(Long cbu, String alias) {
         this.cbu = cbu;
@@ -77,6 +78,22 @@ public class Account {
         receiver.deposit(amount);
 
         return new TransferLog("transfer", amount, this, receiver);
+    }
+
+    public void setOwner(Client client) {
+        owner = client;
+    }
+
+    public Client getOwner() {
+        return owner;
+    }
+
+    public void setCoOwner(Client client) {
+        coOwners.add(client);
+    }
+
+    public ArrayList<Client> getCoOwners() {
+        return new ArrayList<>(coOwners);
     }
 
     @Override
