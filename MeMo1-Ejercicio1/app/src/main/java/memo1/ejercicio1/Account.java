@@ -5,128 +5,129 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class Account {
-    private Long cbu;
-    private String alias;
-    private double balance;
-    private Client owner;
-    private HashSet<Client> coOwners = new HashSet<>();
-    private Branch branch;
+  private Long cbu;
+  private String alias;
+  private double balance;
+  private Client owner;
+  private HashSet<Client> coOwners = new HashSet<>();
+  private Branch branch;
 
-    public Account(Long cbu, String alias) {
-        this.cbu = cbu;
-        this.alias = alias;
+  public Account(Long cbu, String alias) {
+    this.cbu = cbu;
+    this.alias = alias;
+  }
+
+  public Account(Long cbu, String alias, double balance) {
+    this(cbu, alias);
+    setBalance(balance);
+  }
+
+  public Long getCbu() {
+    return cbu;
+  }
+
+  public void setCbu(Long cbu) {
+    this.cbu = cbu;
+  }
+
+  public String getAlias() {
+    return alias;
+  }
+
+  public double getBalance() {
+    return balance;
+  }
+
+  public void setBalance(double balance) {
+    if (balance < 0) {
+      throw new IllegalArgumentException("Balance cannot be negative.");
     }
 
-    public Account(Long cbu, String alias, double balance) {
-        this(cbu, alias);
-        setBalance(balance);
+    this.balance = balance;
+  }
+
+  public TransferLog withdraw(double amount) {
+    if (amount <= 0) {
+      throw new IllegalArgumentException("Amount cannot be negative.");
+    } else if (amount > balance) {
+      throw new IllegalArgumentException("Not enough funds.");
     }
 
-    public Long getCbu() {
-        return cbu;
+    balance -= amount;
+
+    return new TransferLog("withdrawal", amount, this);
+  }
+
+  public TransferLog deposit(double amount) {
+    if (amount < 0) {
+      throw new IllegalArgumentException("Amount has to be positive.");
     }
 
-    public void setCbu(Long cbu) {
-        this.cbu = cbu;
+    balance += amount;
+
+    return new TransferLog("deposit", amount, this);
+  }
+
+  public TransferLog transfer(Account receiver, double amount) {
+    if (receiver == null) {
+      throw new IllegalArgumentException("Receiver account cannot be null.");
+    } else if (receiver.getCbu() == getCbu()) {
+      throw new IllegalArgumentException("Receiver account cannot be same as sender.");
     }
 
-    public String getAlias() {
-        return alias;
+    withdraw(amount);
+    receiver.deposit(amount);
+
+    return new TransferLog("transfer", amount, this, receiver);
+  }
+
+  public void setOwner(Client client) {
+    if (owner != null) {
+      throw new IllegalStateException("Cannot assign multiple owners.");
     }
 
-    public double getBalance() {
-        return balance;
+    owner = client;
+  }
+
+  public Client getOwner() {
+    return owner;
+  }
+
+  public void setCoOwner(Client client) {
+    if (client == owner) {
+      throw new IllegalStateException("Account owner cannot be set as co-owner.");
     }
 
-    public void setBalance(double balance) {
-        if (balance < 0) {
-            throw new IllegalArgumentException("Balance cannot be negative.");
-        }
+    coOwners.add(client);
+  }
 
-        this.balance = balance;
+  public ArrayList<Client> getCoOwners() {
+    return new ArrayList<>(coOwners);
+  }
+
+  public void setBranch(Branch branch) {
+    this.branch = branch;
+  }
+
+  public Branch getBranch() {
+    return branch;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(cbu, alias);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    } else if (obj == null || getClass() != obj.getClass()) {
+      return false;
     }
 
-    public TransferLog withdraw(double amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount cannot be negative.");
-        } else if (amount > balance) {
-            throw new IllegalArgumentException("Not enough funds.");
-        }
-
-        balance -= amount;
-
-        return new TransferLog("withdrawal", amount, this);
-    }
-
-    public TransferLog deposit(double amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount has to be positive.");
-        }
-
-        balance += amount;
-
-        return new TransferLog("deposit", amount, this);
-    }
-
-    public TransferLog transfer(Account receiver, double amount) {
-        if (receiver == null) {
-            throw new IllegalArgumentException("Receiver account cannot be null.");
-        } else if (receiver.getCbu() == getCbu()) {
-            throw new IllegalArgumentException("Receiver account cannot be same as sender.");
-        }
-
-        withdraw(amount);
-        receiver.deposit(amount);
-
-        return new TransferLog("transfer", amount, this, receiver);
-    }
-
-    public void setOwner(Client client) {
-        if (owner != null) {
-            throw new IllegalStateException("Cannot assign multiple owners.");
-        }
-
-        owner = client;
-    }
-
-    public Client getOwner() {
-        return owner;
-    }
-
-    public void setCoOwner(Client client) {
-        if (client == owner) {
-            throw new IllegalStateException("Account owner cannot be set as co-owner.");
-        }
-
-        coOwners.add(client);
-    }
-
-    public ArrayList<Client> getCoOwners() {
-        return new ArrayList<>(coOwners);
-    }
-
-    public void setBranch(Branch branch) {
-        this.branch = branch;
-    }
-
-    public Branch getBranch() {
-        return branch;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(cbu, alias);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        } else if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        Account otherAccount = (Account) obj;
-        return Objects.equals(getCbu(), otherAccount.getCbu()) && Objects.equals(getAlias(), otherAccount.getAlias());
-    }
+    Account otherAccount = (Account) obj;
+    return Objects.equals(getCbu(), otherAccount.getCbu())
+        && Objects.equals(getAlias(), otherAccount.getAlias());
+  }
 }

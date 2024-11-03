@@ -1,5 +1,7 @@
 plugins {
     application
+
+    id("com.diffplug.spotless") version "7.0.0.BETA4"
 }
 
 repositories {
@@ -17,7 +19,18 @@ dependencies {
 }
 
 application {
-    mainClass.set("memo1.ejercicio1.Main")
+    mainClass.set("memo1.ejercicio.Main")
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+
+    exclude("**/CucumberTest*")
+
+    testLogging {
+        events("failed")
+        showStandardStreams = false
+    }
 }
 
 tasks.register<Test>("cucumberTest") {
@@ -31,13 +44,16 @@ tasks.register<Test>("cucumberTest") {
     }
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform()
-
-    exclude("**/CucumberTest*")
-
-    testLogging {
-        events("failed")
-        showStandardStreams = false
+spotless {
+    java {
+        googleJavaFormat()
     }
+}
+
+tasks.named("build") {
+    dependsOn("spotlessApply")
+}
+
+tasks.register("format") {
+    dependsOn("spotlessApply")
 }
