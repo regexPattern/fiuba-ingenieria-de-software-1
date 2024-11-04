@@ -11,31 +11,30 @@ public class BranchSteps {
   private BranchRegistry branchRegistry;
   private Exception operationResult;
 
-  @Given("I create a branch with code {int}, name {string} and address {string}")
-  @Given("A branch with code {int}, name {string} and address {string}")
-  @Given("An opened branch with code {int}, name {string} and address {string}")
-  public void createAndRegisterABranch(int code, String name, String address) {
+  @Given("I create a branch with code {long}, name {string} and address {string}")
+  @Given("An opened branch with code {long}, name {string} and address {string}")
+  public void createAndRegisterABranch(Long code, String name, String address) {
     branchRegistry = new BranchRegistry();
     branch = new Branch(code, name, address);
-    branchRegistry.registerBranch(branch);
+    branchRegistry.register(branch);
   }
 
-  @Given("Another branch with code {int}, name {string} and address {string}")
-  public void createAndRegisterAnoteBranch(int code, String name, String address) {
+  @Given("Another branch with code {long}, name {string} and address {string}")
+  public void createAndRegisterAnoteBranch(Long code, String name, String address) {
     branch = new Branch(code, name, address);
-    branchRegistry.registerBranch(branch);
+    branchRegistry.register(branch);
   }
 
-  @Given("A closed branch with code {int}, name {string} and address {string}")
-  public void createRegisterAndCloseABranch(int code, String name, String address) {
+  @Given("A closed branch with code {long}, name {string} and address {string}")
+  public void createRegisterAndCloseABranch(Long code, String name, String address) {
     branchRegistry = new BranchRegistry();
     branch = new Branch(code, name, address);
-    branchRegistry.registerBranch(branch);
-    branchRegistry.closeBranch(branch.getCode());
+    branchRegistry.register(branch);
+    branchRegistry.close(branch.getCode());
   }
 
-  @Then("The branch code should be {int}")
-  public void verifyBranchCode(int code) {
+  @Then("The branch code should be {long}")
+  public void verifyBranchCode(Long code) {
     assertEquals(branch.getCode(), code);
   }
 
@@ -49,11 +48,11 @@ public class BranchSteps {
     assertEquals(branch.getAddress(), address);
   }
 
-  @When("I try to register another branch with code {int}, name {string} and address {string}")
-  public void tryToRegisterAnotherBranch(int code, String name, String address) {
+  @When("I try to register another branch with code {long}, name {string} and address {string}")
+  public void tryToRegisterAnotherBranch(Long code, String name, String address) {
     Branch newBranch = new Branch(code, name, address);
     try {
-      branchRegistry.registerBranch(newBranch);
+      branchRegistry.register(newBranch);
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -68,7 +67,7 @@ public class BranchSteps {
 
   @When("I close the branch")
   public void closeBranch() {
-    branchRegistry.closeBranch(branch.getCode());
+    branchRegistry.close(branch.getCode());
   }
 
   @Then("The branch should be closed")
@@ -78,7 +77,7 @@ public class BranchSteps {
 
   @When("I reopen the branch")
   public void reOpenBranch() {
-    branchRegistry.reOpenBranch(branch.getCode());
+    branchRegistry.reOpen(branch.getCode());
   }
 
   @Then("The branch should be reopened")
@@ -86,19 +85,19 @@ public class BranchSteps {
     assertTrue(branch.isOpen());
   }
 
-  @When("I try to close a branch with code {int} that has not been registered")
-  public void tryToCloseABranchThatHasNotBeenRegistered(int code) {
+  @When("I try to close a branch with code {long} that has not been registered")
+  public void tryToCloseABranchThatHasNotBeenRegistered(Long code) {
     try {
-      branchRegistry.closeBranch(code);
+      branchRegistry.close(code);
     } catch (Exception exception) {
       operationResult = exception;
     }
   }
 
-  @When("I try to reopen a branch with code {int} that has not been registered")
-  public void tryToReOpenABranchThatHasNotBeenRegistered(int code) {
+  @When("I try to reopen a branch with code {long} that has not been registered")
+  public void tryToReOpenABranchThatHasNotBeenRegistered(Long code) {
     try {
-      branchRegistry.reOpenBranch(code);
+      branchRegistry.reOpen(code);
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -130,8 +129,8 @@ public class BranchSteps {
     assertEquals(registeredBranches.get(0).getAddress(), registeredBranches.get(1).getAddress());
   }
 
-  @When("I update the branch with code {int} name to {string}")
-  public void updateBranchName(int code, String name) {
+  @When("I update the branch with code {long} name to {string}")
+  public void updateBranchName(Long code, String name) {
     try {
       branchRegistry.updateBranchName(code, name);
     } catch (Exception exception) {
@@ -139,8 +138,8 @@ public class BranchSteps {
     }
   }
 
-  @And("I update the branch with code {int} address to {string}")
-  public void updateBranchAddress(int code, String address) {
+  @And("I update the branch with code {long} address to {string}")
+  public void updateBranchAddress(Long code, String address) {
     try {
       branchRegistry.updateBranchAddress(code, address);
     } catch (Exception exception) {
@@ -153,13 +152,13 @@ public class BranchSteps {
     assertNotNull(operationResult);
   }
 
-  @And("The branch with code {int} name should remain {string}")
-  public void verifyNameOfBranchByCode(int code, String name) {
+  @And("The branch with code {long} name should remain {string}")
+  public void verifyNameOfBranchByCode(Long code, String name) {
     assertEquals(branchRegistry.getBranch(code).getName(), name);
   }
 
-  @And("The branch with code {int} address should remain {string}")
-  public void verifyAddressOfBranchByCode(int code, String address) {
+  @And("The branch with code {long} address should remain {string}")
+  public void verifyAddressOfBranchByCode(Long code, String address) {
     assertEquals(branchRegistry.getBranch(code).getAddress(), address);
   }
 

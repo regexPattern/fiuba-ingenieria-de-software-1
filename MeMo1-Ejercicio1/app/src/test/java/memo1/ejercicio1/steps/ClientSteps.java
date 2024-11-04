@@ -44,13 +44,6 @@ public class ClientSteps {
     assertEquals(client.getAddress(), address);
   }
 
-  @Given("A client with DNI {long}, name {string} and surname {string}")
-  public void createClientWithDniOnly(Long dni, String name, String surName) {
-    clientRegistry = new ClientRegistry();
-    client = new Client(dni, name, surName);
-    clientRegistry.registerClient(client);
-  }
-
   @When("I try to register another client with DNI {long}, name {string} and surname {string}")
   public void createPersonWithAlreadyTakenDni(Long dni, String name, String surName) {
     Client newClient = new Client(dni, name, surName);

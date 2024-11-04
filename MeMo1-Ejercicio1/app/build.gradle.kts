@@ -14,6 +14,7 @@ dependencies {
 
     testImplementation ("io.cucumber:cucumber-java:7.4.1")
     testImplementation ("io.cucumber:cucumber-junit:7.4.1")
+    testImplementation("io.cucumber:cucumber-picocontainer:7.4.1")
 
     implementation("com.google.guava:guava:31.1-jre")
 }
@@ -22,10 +23,10 @@ application {
     mainClass.set("memo1.ejercicio.Main")
 }
 
-tasks.named<Test>("test") {
+tasks.register<Test>("cucumberTest") {
     useJUnitPlatform()
 
-    exclude("**/CucumberTest*")
+    include("**/CucumberTest*")
 
     testLogging {
         events("failed")
@@ -33,10 +34,11 @@ tasks.named<Test>("test") {
     }
 }
 
-tasks.register<Test>("cucumberTest") {
+tasks.named<Test>("test") {
     useJUnitPlatform()
 
-    include("**/CucumberTest*")
+    include("**/*Test*")
+    exclude("**/CucumberTest*")
 
     testLogging {
         events("failed")

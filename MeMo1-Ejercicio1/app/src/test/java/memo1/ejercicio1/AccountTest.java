@@ -12,15 +12,15 @@ class AccountTest {
   void constructorShouldSetCbuAliasBranchAndOwnersCorrectly() {
     Long cbu = 123456789L;
     String alias = "account";
-    Branch branch = new Branch(1, "Branch 1", "Paseo Colón 950");
+    Branch branch = new Branch(1L, "Branch 1", "Paseo Colón 950");
     Client owner = new Client(96113425L, "Carlos", "Castillo");
 
     Account account = new Account(cbu, alias, branch, owner);
 
     assertEquals(account.getCbu(), cbu);
     assertEquals(account.getAlias(), alias);
-    assertEquals(account.getBranch(), alias);
-    assertEquals(account.getOwner(), alias);
+    assertEquals(account.getBranch(), branch);
+    assertEquals(account.getOwner(), owner);
     assertEquals(account.getCoOwners().size(), 0);
   }
 
@@ -30,7 +30,7 @@ class AccountTest {
         new Account(
             123456789L,
             "account",
-            new Branch(1, "Branch 1", "Paseo Colón 950"),
+            new Branch(1L, "Branch 1", "Paseo Colón 950"),
             new Client(96113425L, "Carlos", "Castillo"));
 
     assertEquals(account.getBalance(), 0.0);
@@ -44,7 +44,7 @@ class AccountTest {
         new Account(
             123456789L,
             "account",
-            new Branch(1, "Branch 1", "Paseo Colón 950"),
+            new Branch(1L, "Branch 1", "Paseo Colón 950"),
             new Client(96113425L, "Carlos", "Castillo"),
             balance);
 
@@ -52,7 +52,52 @@ class AccountTest {
   }
 
   @Test
-  void constructorShouldThrowExceptionIfBalanceIsNegative() {
+  void constructorThrowsExceptionIfAliasIsNull() {
+    String alias = null;
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L,
+                    alias,
+                    new Branch(1L, "Branch 1", "Paseo Colón 950"),
+                    new Client(96113425L, "Carlos", "Castillo")));
+
+    assertEquals(exception.getMessage(), "Alias cannot be null.");
+  }
+
+  @Test
+  void constructorThrowsExceptionIfBranchIsNull() {
+    Branch branch = null;
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
+
+    assertEquals(exception.getMessage(), "Branch cannot be null.");
+  }
+
+  @Test
+  void constructorThrowsExceptionIfOwnerIsNull() {
+    Client owner = null;
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner));
+
+    assertEquals(exception.getMessage(), "Owner cannot be null.");
+  }
+
+  @Test
+  void constructorThrowsExceptionIfBalanceIsNegative() {
     Double balance = -50.0;
 
     Exception exception =
@@ -62,7 +107,7 @@ class AccountTest {
                 new Account(
                     123456789L,
                     "account",
-                    new Branch(1, "Branch 1", "Paseo Colón 950"),
+                    new Branch(1L, "Branch 1", "Paseo Colón 950"),
                     new Client(96113425L, "Carlos", "Castillo"),
                     balance));
 
@@ -70,12 +115,12 @@ class AccountTest {
   }
 
   @Test
-  void settingOwnerShouldChangeTheAccountOwner() {
+  void settingNewOwnerShouldChangeTheAccountOwner() {
     Client owner = new Client(98765421L, "Carlos", "Castillo");
     Client newOwner = new Client(11231232L, "Eduardo", "Pereira");
 
     Account account =
-        new Account(123456789L, "account", new Branch(1, "Branch 1", "Paseo Colón 950"), owner);
+        new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
 
     account.setOwner(newOwner);
 
@@ -83,12 +128,12 @@ class AccountTest {
   }
 
   @Test
-  void settingOwnerShouldAddThePreviousOwnerAsCoOwner() {
+  void settingNewOwnerAddsThePreviousOwnerAsCoOwner() {
     Client owner = new Client(98765421L, "Carlos", "Castillo");
     Client newOwner = new Client(11231232L, "Eduardo", "Pereira");
 
     Account account =
-        new Account(123456789L, "account", new Branch(1, "Branch 1", "Paseo Colón 950"), owner);
+        new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
 
     account.setOwner(newOwner);
 
@@ -97,7 +142,27 @@ class AccountTest {
   }
 
   @Test
-  void settingCoOwnersAddsThemToCoOwnersList() {
+  void settingNullOwnerThrowsException() {
+    Account account = dummyAccount();
+
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> account.setOwner(null));
+
+    assertEquals(exception.getMessage(), "New owner cannot be null.");
+  }
+
+  @Test
+  void settingNullCoOwnerThrowsException() {
+    Account account = dummyAccount();
+
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> account.setCoOwner(null));
+
+    assertEquals(exception.getMessage(), "New co-owner cannot be null.");
+  }
+
+  @Test
+  void settingNewCoOwnersAddsThemToCoOwnersList() {
     Account account = dummyAccount();
 
     Client client1 = new Client(98765421L, "Wendollin", "Hernández");
@@ -133,39 +198,39 @@ class AccountTest {
     Exception exception =
         assertThrows(IllegalStateException.class, () -> account.setCoOwner(account.getOwner()));
 
-    assertEquals(exception.getMessage(), "asjakfjal");
+    assertEquals(exception.getMessage(), "Account owner cannot be set as co-owner.");
   }
 
   @Test
   void comparingTwoAccountsForEquality() {
-    Long CBU1 = 123456789L;
+    Long Cbu1 = 123456789L;
     String alias1 = "alias1";
-    Branch branch1 = new Branch(1, "Branch 1", "Paseo Colón 950");
+    Branch branch1 = new Branch(1L, "Branch 1", "Paseo Colón 950");
     Client owner1 = new Client(1L, "Carlos", "Castillo");
 
-    Long CBU2 = 987654321L;
+    Long Cbu2 = 987654321L;
     String alias2 = "alias2";
-    Branch branch2 = new Branch(2, "Branch 2", "Las Heras 2214");
+    Branch branch2 = new Branch(2L, "Branch 2", "Las Heras 2214");
     Client owner2 = new Client(2L, "Eduardo", "Pereira");
 
     assertEquals(
-        new Account(CBU1, alias1, branch1, owner1), new Account(CBU1, alias1, branch1, owner1));
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch1, owner1));
 
     assertNotEquals(
-        new Account(CBU1, alias1, branch1, owner1), new Account(CBU2, alias1, branch1, owner1));
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu2, alias1, branch1, owner1));
     assertNotEquals(
-        new Account(CBU1, alias1, branch1, owner1), new Account(CBU1, alias2, branch1, owner1));
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias2, branch1, owner1));
     assertNotEquals(
-        new Account(CBU1, alias1, branch1, owner1), new Account(CBU1, alias1, branch2, owner1));
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch2, owner1));
     assertNotEquals(
-        new Account(CBU1, alias1, branch1, owner1), new Account(CBU1, alias1, branch1, owner2));
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch1, owner2));
   }
 
   private Account dummyAccount() {
     return new Account(
         123456789L,
         "account",
-        new Branch(1, "Branch 1", "Paseo Colón 950"),
+        new Branch(1L, "Branch 1", "Paseo Colón 950"),
         new Client(96113425L, "Carlos", "Castillo"));
   }
 }

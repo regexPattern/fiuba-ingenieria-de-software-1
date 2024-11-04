@@ -5,21 +5,30 @@ import java.util.HashSet;
 import java.util.Objects;
 
 public class Account {
-  private Long cbu;
+  private long cbu;
   private String alias;
   private Branch branch;
   private Client owner;
   private HashSet<Client> coOwners = new HashSet<>();
-  private Double balance;
+  private double balance;
 
-  public Account(Long cbu, String alias, Branch branch, Client owner) {
+  public Account(long cbu, String alias, Branch branch, Client owner) {
+    if (alias == null) {
+      throw new IllegalArgumentException("Alias cannot be null.");
+    } else if (branch == null) {
+      throw new IllegalArgumentException("Branch cannot be null.");
+    } else if (owner == null) {
+      throw new IllegalArgumentException("Owner cannot be null.");
+    }
+
     this.cbu = cbu;
     this.alias = alias;
     this.branch = branch;
     this.owner = owner;
+    this.balance = 0.0;
   }
 
-  public Account(Long cbu, String alias, Branch branch, Client owner, Double balance) {
+  public Account(long cbu, String alias, Branch branch, Client owner, double balance) {
     this(cbu, alias, branch, owner);
 
     if (balance < 0) {
@@ -80,41 +89,41 @@ public class Account {
     return new Transaction("deposit", amount, this);
   }
 
-  void setOwner(Client client) {
-    if (owner != null) {
-      throw new IllegalStateException("Cannot assign multiple owners.");
-    }
-
-    owner = client;
-  }
-
   public Client getOwner() {
     return owner;
   }
 
-  // TODO: Tendria que tener algun test que me diga si puedo volver a agregar
-  // co-owners que ya son co-owners. Realmente esto si funciona porque tengo un
-  // hashset, pero eso es implementacion interna.
-  public void setCoOwner(Client client) {
-    if (client == owner) {
-      throw new IllegalStateException("Account owner cannot be set as co-owner.");
+  void setOwner(Client client) {
+    if (client == null) {
+      throw new IllegalArgumentException("New owner cannot be null.");
     }
 
-    coOwners.add(client);
+    Client oldOwner = getOwner();
+    owner = client;
+
+    setCoOwner(oldOwner);
   }
 
   public ArrayList<Client> getCoOwners() {
     return new ArrayList<>(coOwners);
   }
 
-  // TODO: Este metodo deberia existir pero solo para uso interno por parte del
-  // account manager o del branch manager.
-  public void setBranch(Branch branch) {
-    this.branch = branch;
+  public void setCoOwner(Client client) {
+    if (client == null) {
+      throw new IllegalArgumentException("New co-owner cannot be null.");
+    } else if (client.equals(owner)) {
+      throw new IllegalStateException("Account owner cannot be set as co-owner.");
+    }
+
+    coOwners.add(client);
   }
 
   public Branch getBranch() {
     return branch;
+  }
+
+  public void setBranch(Branch branch) {
+    this.branch = branch;
   }
 
   @Override
@@ -131,7 +140,10 @@ public class Account {
     }
 
     Account otherAccount = (Account) obj;
+
     return Objects.equals(getCbu(), otherAccount.getCbu())
-        && Objects.equals(getAlias(), otherAccount.getAlias());
+        && Objects.equals(getAlias(), otherAccount.getAlias())
+        && Objects.equals(getBranch(), otherAccount.getBranch())
+        && Objects.equals(getOwner(), otherAccount.getOwner());
   }
 }

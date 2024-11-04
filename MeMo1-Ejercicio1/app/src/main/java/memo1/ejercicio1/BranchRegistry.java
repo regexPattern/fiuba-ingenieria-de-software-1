@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class BranchRegistry {
-  private HashMap<Integer, Branch> registeredBranches = new HashMap<>();
+  private HashMap<Long, Branch> registeredBranches = new HashMap<>();
   private HashSet<String> registeredBranchNames = new HashSet<>();
   private HashSet<String> registeredBranchAddresses = new HashSet<>();
 
-  public void registerBranch(Branch branch) {
+  public void register(Branch branch) {
     if (registeredBranches.putIfAbsent(branch.getCode(), branch) != null) {
       throw new IllegalStateException("Code already in use by another branch.");
     } else if (registeredBranchNames.contains(branch.getName())) {
@@ -24,7 +24,7 @@ public class BranchRegistry {
     return new ArrayList<>(registeredBranches.values());
   }
 
-  public boolean reOpenBranch(Integer code) {
+  public boolean reOpen(Long code) {
     Branch branch = getBranch(code);
     if (branch == null) {
       return false;
@@ -33,7 +33,7 @@ public class BranchRegistry {
     return true;
   }
 
-  public boolean closeBranch(Integer code) {
+  public Boolean close(Long code) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
@@ -48,7 +48,7 @@ public class BranchRegistry {
     }
   }
 
-  public boolean updateBranchName(Integer code, String name) {
+  public boolean updateBranchName(Long code, String name) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
@@ -66,7 +66,7 @@ public class BranchRegistry {
     return true;
   }
 
-  public boolean updateBranchAddress(Integer code, String address) {
+  public boolean updateBranchAddress(Long code, String address) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
@@ -81,7 +81,7 @@ public class BranchRegistry {
     return true;
   }
 
-  public Branch getBranch(int code) {
+  public Branch getBranch(Long code) {
     return registeredBranches.get(code);
   }
 }

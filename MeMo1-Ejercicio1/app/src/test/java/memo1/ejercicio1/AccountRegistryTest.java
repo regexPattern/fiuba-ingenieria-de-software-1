@@ -64,7 +64,7 @@ class AccountRegistryTest {
   }
 
   private Branch dummyBranch() {
-    return new Branch(1, "Branch 1", "Paseo Colón 950");
+    return new Branch(1L, "Branch 1", "Paseo Colón 950");
   }
 
   private Client dummyOwner() {
