@@ -22,7 +22,7 @@ class ClientTest {
 
   @Test
   void constructorShouldThrowExceptionIfBirthDateFormatIsNotAValidDate() {
-    Long dni = 123456789L;
+    long dni = 123456789L;
     String name = "Carlos";
     String surName = "Castillo";
     String address = "Paseo Colón 950";

@@ -14,12 +14,12 @@ public class ClientSteps {
   @Given(
       "I create a client with DNI {long}, name {string}, surname {string}, birth date {string} and address {string}")
   public void createPerson(
-      Long dni, String name, String surName, String birthDateString, String address) {
+      long dni, String name, String surName, String birthDateString, String address) {
     client = new Client(dni, name, surName, birthDateString, address);
   }
 
   @Then("The client DNI should be {long}")
-  public void verifyDni(Long dni) {
+  public void verifyDni(long dni) {
     assertEquals(client.getDni(), dni);
   }
 
@@ -45,7 +45,7 @@ public class ClientSteps {
   }
 
   @When("I try to register another client with DNI {long}, name {string} and surname {string}")
-  public void createPersonWithAlreadyTakenDni(Long dni, String name, String surName) {
+  public void createPersonWithAlreadyTakenDni(long dni, String name, String surName) {
     Client newClient = new Client(dni, name, surName);
     try {
       clientRegistry.registerClient(newClient);

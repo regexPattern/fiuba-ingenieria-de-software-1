@@ -17,7 +17,7 @@ public class ClientCommonSteps {
   }
 
   @Given("A client with DNI {long}, name {string} and surname {string}")
-  public void createClient(Long dni, String name, String surname) {
+  public void createClient(long dni, String name, String surname) {
     client = new Client(dni, name, surname);
   }
 }

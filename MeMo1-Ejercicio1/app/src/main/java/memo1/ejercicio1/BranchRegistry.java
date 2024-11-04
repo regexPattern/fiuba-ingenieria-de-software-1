@@ -5,42 +5,44 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class BranchRegistry {
-  private HashMap<Long, Branch> registeredBranches = new HashMap<>();
-  private HashSet<String> registeredBranchNames = new HashSet<>();
-  private HashSet<String> registeredBranchAddresses = new HashSet<>();
+  private HashMap<Long, Branch> branchesByCode = new HashMap<>();
+  private HashSet<String> usedBranchNames = new HashSet<>();
+  private HashSet<String> useBranchAddresses = new HashSet<>();
 
   public void register(Branch branch) {
-    if (registeredBranches.putIfAbsent(branch.getCode(), branch) != null) {
+    if (branchesByCode.putIfAbsent(branch.getCode(), branch) != null) {
       throw new IllegalStateException("Code already in use by another branch.");
-    } else if (registeredBranchNames.contains(branch.getName())) {
+    } else if (usedBranchNames.contains(branch.getName())) {
       throw new IllegalStateException("Name already in use by another branch.");
     }
 
     branch.setOpen(true);
-    registeredBranchNames.add(branch.getName());
+    usedBranchNames.add(branch.getName());
   }
 
-  public ArrayList<Branch> getRegisteredBranches() {
-    return new ArrayList<>(registeredBranches.values());
+  public ArrayList<Branch> getBranchCodes() {
+    return new ArrayList<>(branchesByCode.values());
   }
 
-  public boolean reOpen(Long code) {
+  public boolean reOpen(long code) {
     Branch branch = getBranch(code);
+
     if (branch == null) {
       return false;
     }
+
     branch.setOpen(true);
     return true;
   }
 
-  public Boolean close(Long code) {
+  public Boolean close(long code) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
       throw new IllegalStateException("Branch with given code has not been registered.");
     }
 
-    if (!branch.isOpen()) {
+    if (!branch.getOpen()) {
       return false;
     } else {
       branch.setOpen(false);
@@ -48,17 +50,17 @@ public class BranchRegistry {
     }
   }
 
-  public boolean updateBranchName(Long code, String name) {
+  public boolean updateBranchName(long code, String name) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
       throw new IllegalStateException("Branch with given code has not been registered.");
     }
 
-    if (!registeredBranchNames.contains(name)) {
-      registeredBranchNames.remove(branch.getName());
+    if (!usedBranchNames.contains(name)) {
+      usedBranchNames.remove(branch.getName());
       branch.setName(name);
-      registeredBranchNames.add(name);
+      usedBranchNames.add(name);
     } else {
       throw new IllegalStateException("Name already in use by another branch.");
     }
@@ -66,22 +68,22 @@ public class BranchRegistry {
     return true;
   }
 
-  public boolean updateBranchAddress(Long code, String address) {
+  public boolean updateBranchAddress(long code, String address) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
       throw new IllegalStateException("Branch with given code has not been registered.");
     }
 
-    if (!registeredBranchNames.contains(address)) {
+    if (!usedBranchNames.contains(address)) {
       branch.setAddress(address);
-      registeredBranchAddresses.add(address);
+      useBranchAddresses.add(address);
     }
 
     return true;
   }
 
-  public Branch getBranch(Long code) {
-    return registeredBranches.get(code);
+  public Branch getBranch(long code) {
+    return branchesByCode.get(code);
   }
 }

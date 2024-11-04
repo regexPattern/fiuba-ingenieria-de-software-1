@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Client {
-  private Long dni;
+  private long dni;
   private String name;
   private String surName;
   private LocalDate birthDate;
@@ -13,13 +13,13 @@ public class Client {
 
   public static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-  public Client(Long dni, String name, String surName) {
+  public Client(long dni, String name, String surName) {
     this.dni = dni;
     this.name = name;
     this.surName = surName;
   }
 
-  public Client(Long dni, String name, String surName, String birthDateString, String address) {
+  public Client(long dni, String name, String surName, String birthDateString, String address) {
     this(dni, name, surName);
     this.address = address;
 
@@ -31,7 +31,7 @@ public class Client {
     this.birthDate = birthDate;
   }
 
-  public Long getDni() {
+  public long getDni() {
     return dni;
   }
 

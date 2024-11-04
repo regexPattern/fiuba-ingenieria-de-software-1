@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 class AccountTest {
   @Test
-  void constructorShouldSetCbuAliasBranchAndOwnersCorrectly() {
-    Long cbu = 123456789L;
+  void constructorSetsCbuAliasBranchAndOwnersCorrectly() {
+    long cbu = 123456789L;
     String alias = "account";
     Branch branch = new Branch(1L, "Branch 1", "Paseo Colón 950");
     Client owner = new Client(96113425L, "Carlos", "Castillo");
@@ -25,7 +25,7 @@ class AccountTest {
   }
 
   @Test
-  void constructorShouldInitializeBalanceToZero() {
+  void constructorInitializesBalanceToZero() {
     Account account =
         new Account(
             123456789L,
@@ -37,7 +37,7 @@ class AccountTest {
   }
 
   @Test
-  void constructorShouldSetBalanceCorrectly() {
+  void constructorSetsBalanceCorrectly() {
     Double balance = 56471.2;
 
     Account account =
@@ -83,6 +83,22 @@ class AccountTest {
   }
 
   @Test
+  void constructorThrowsExceptionIfBranchIsClosed() {
+    Branch branch = new Branch(1L, "Branch 1", "Paseo Colón 950");
+
+    branch.setOpen(false);
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
+
+    assertEquals(exception.getMessage(), "Branch cannot be null.");
+  }
+
+  @Test
   void constructorThrowsExceptionIfOwnerIsNull() {
     Client owner = null;
 
@@ -115,7 +131,7 @@ class AccountTest {
   }
 
   @Test
-  void settingNewOwnerShouldChangeTheAccountOwner() {
+  void settingNewOwnerChangesTheAccountOwner() {
     Client owner = new Client(98765421L, "Carlos", "Castillo");
     Client newOwner = new Client(11231232L, "Eduardo", "Pereira");
 
@@ -203,12 +219,12 @@ class AccountTest {
 
   @Test
   void comparingTwoAccountsForEquality() {
-    Long Cbu1 = 123456789L;
+    long Cbu1 = 123456789L;
     String alias1 = "alias1";
     Branch branch1 = new Branch(1L, "Branch 1", "Paseo Colón 950");
     Client owner1 = new Client(1L, "Carlos", "Castillo");
 
-    Long Cbu2 = 987654321L;
+    long Cbu2 = 987654321L;
     String alias2 = "alias2";
     Branch branch2 = new Branch(2L, "Branch 2", "Las Heras 2214");
     Client owner2 = new Client(2L, "Eduardo", "Pereira");

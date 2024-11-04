@@ -12,14 +12,14 @@ public class TransferSteps {
   private Transaction transaction;
 
   @Given("A sender account with CBU {long}, alias {string} and a balance of {double}")
-  public void createSenderAccount(Long cbu, String alias, double balance) {
+  public void createSenderAccount(long cbu, String alias, double balance) {
     sender =
         new Account(
             cbu, alias, new Branch(1L, "", ""), new Client(123456789L, "", ""), balance); // TODO
   }
 
   @And("A receiver account with CBU {long}, alias {string} and a balance of {double}")
-  public void createReceiverAccount(Long cbu, String alias, double balance) {
+  public void createReceiverAccount(long cbu, String alias, double balance) {
     receiver =
         new Account(
             cbu, alias, new Branch(1L, "", ""), new Client(123456789L, "", ""), balance); // TODO

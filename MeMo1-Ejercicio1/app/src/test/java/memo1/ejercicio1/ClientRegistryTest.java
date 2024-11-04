@@ -32,7 +32,7 @@ class ClientRegistryTest {
   @Test
   void tryingToUnregisterAClientThatIsNotYetRegisteredReturnsNull() {
     ClientRegistry clientRegistry = new ClientRegistry();
-    Long dni = 987654321L;
+    long dni = 987654321L;
 
     clientRegistry.registerClient(new Client(123456789L, "Carlos", "Castillo"));
 

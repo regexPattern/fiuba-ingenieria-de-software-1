@@ -7,22 +7,23 @@ import org.junit.jupiter.api.Test;
 
 class BranchRegistryTest {
   @Test
-  void aBranchRegistryIsCreatedWithNoBranches() {
+  void constructorInitializesBranchRegistryWithNoBranches() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
-    assertEquals(branchRegistry.getRegisteredBranches().size(), 0);
+    assertEquals(branchRegistry.getBranchCodes().size(), 0);
   }
 
   @Test
-  void registerBranchesToABranchRegistry() {
+  void registeringBranchesToBranchRegistry() {
     BranchRegistry branchRegistry = new BranchRegistry();
-    Branch branch1 = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
-    Branch branch2 = new Branch(2L, "Suc. Recoleta", "Santa Fe 2000 CABA");
+
+    Branch branch1 = new Branch(17512312L, "Suc. Belgrano", "Cabildo 1000 CABA");
+    Branch branch2 = new Branch(24123129L, "Suc. Recoleta", "Santa Fe 2000 CABA");
 
     branchRegistry.register(branch1);
     branchRegistry.register(branch2);
 
-    ArrayList<Branch> registeredBranches = branchRegistry.getRegisteredBranches();
+    ArrayList<Branch> registeredBranches = branchRegistry.getBranchCodes();
 
     assertEquals(registeredBranches.size(), 2);
     assertTrue(registeredBranches.contains(branch1));
@@ -30,34 +31,35 @@ class BranchRegistryTest {
   }
 
   @Test
-  void registeringABranchSetsItAsOpened() {
+  void registeringBranchSetsItAsOpened() {
     BranchRegistry branchRegistry = new BranchRegistry();
-    Branch branch = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
+
+    Branch branch = new Branch(17512312L, "Suc. Belgrano", "Cabildo 1000 CABA");
 
     branchRegistry.register(branch);
 
-    assertTrue(branch.isOpen());
+    assertTrue(branch.getOpen());
   }
 
   @Test
-  void registeringABranchWithARepeatedCodeThrowsException() {
+  void registeringBranchWithRepeatedCodeThrowsException() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
-    Branch branch1 = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
-    Branch branch2 = new Branch(2L, "Suc. Recoleta", "Santa Fe 1000 CABA");
+    Branch branch = new Branch(17512312L, "Suc. Belgrano", "Cabildo 1000 CABA");
 
-    branchRegistry.register(branch1);
+    branchRegistry.register(branch);
 
-    Exception exception =
-        assertThrows(IllegalStateException.class, () -> branchRegistry.register(branch2));
+    Exception exception = assertThrows(IllegalStateException.class,
+        () -> branchRegistry.register(new Branch(branch.getCode(), "Suc. Recoleta", "Santa Fe 1000 CABA")));
 
     assertEquals(exception.getMessage(), "Code already in use by another branch.");
   }
 
   @Test
-  void closingARegisteredBranchThatIsOpenReturnsTrue() {
+  void closingBranchThatIsOpenReturnsTrue() {
     BranchRegistry branchRegistry = new BranchRegistry();
-    Branch branch = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
+
+    Branch branch = new Branch(17512312L, "Suc. Belgrano", "Cabildo 1000 CABA");
 
     branchRegistry.register(branch);
 
@@ -65,9 +67,10 @@ class BranchRegistryTest {
   }
 
   @Test
-  void closingARegisteredBranchThatIsAlreadyClosedReturnsTrue() {
+  void closingBranchThatIsAlreadyClosedReturnsTrue() {
     BranchRegistry branchRegistry = new BranchRegistry();
-    Branch branch = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
+
+    Branch branch = new Branch(17512312L, "Suc. Belgrano", "Cabildo 1000 CABA");
 
     branchRegistry.register(branch);
     branchRegistry.close(branch.getCode());
@@ -76,18 +79,16 @@ class BranchRegistryTest {
   }
 
   @Test
-  void tryingToCloseABranchThatIsNotYetRegisteredThrowsException() {
+  void closingBranchThatIsNotYetRegisteredThrowsException() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
-    branchRegistry.register(new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA"));
-
-    Exception exception = assertThrows(IllegalStateException.class, () -> branchRegistry.close(2L));
+    Exception exception = assertThrows(IllegalStateException.class, () -> branchRegistry.close(17512312L));
 
     assertEquals(exception.getMessage(), "Branch with given code has not been registered.");
   }
 
   @Test
-  void anAccountCanBeReOpenedAfterBeingClosed() {
+  void accountCanBeReOpenedAfterBeingClosed() {
     BranchRegistry branchRegistry = new BranchRegistry();
     Branch branch = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
 
@@ -96,7 +97,7 @@ class BranchRegistryTest {
     branchRegistry.close(branch.getCode());
     branchRegistry.reOpen(branch.getCode());
 
-    assertTrue(branch.isOpen());
+    assertTrue(branch.getOpen());
   }
 
   @Test
@@ -109,7 +110,7 @@ class BranchRegistryTest {
     branchRegistry.close(branch.getCode());
     branchRegistry.close(branch.getCode());
 
-    assertFalse(branch.isOpen());
+    assertFalse(branch.getOpen());
   }
 
   @Test
@@ -125,18 +126,17 @@ class BranchRegistryTest {
   }
 
   @Test
-  void updatingANonRegisteredBranchThrowsException() {
+  void updatingNonRegisteredBranchThrowsException() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
-    Exception exception =
-        assertThrows(
-            IllegalStateException.class, () -> branchRegistry.updateBranchName(900L, "New Name"));
+    Exception exception = assertThrows(
+        IllegalStateException.class, () -> branchRegistry.updateBranchName(900L, "New Name"));
 
     assertEquals(exception.getMessage(), "Branch with given code has not been registered.");
   }
 
   @Test
-  void updatingABranchNameAllowsAnotherBranchToReuseThePreviousName() {
+  void updatingBranchNameAllowsAnotherBranchToReuseThePreviousName() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
     String previousName = "Suc. Belgrano";
@@ -148,6 +148,6 @@ class BranchRegistryTest {
     Branch branch2 = new Branch(2L, previousName, "Santa Fe 1000 CABA");
     branchRegistry.register(branch2);
 
-    assertEquals(branchRegistry.getRegisteredBranches().size(), 2);
+    assertEquals(branchRegistry.getBranchCodes().size(), 2);
   }
 }

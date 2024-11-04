@@ -13,20 +13,20 @@ public class BranchSteps {
 
   @Given("I create a branch with code {long}, name {string} and address {string}")
   @Given("An opened branch with code {long}, name {string} and address {string}")
-  public void createAndRegisterABranch(Long code, String name, String address) {
+  public void createAndRegisterABranch(long code, String name, String address) {
     branchRegistry = new BranchRegistry();
     branch = new Branch(code, name, address);
     branchRegistry.register(branch);
   }
 
   @Given("Another branch with code {long}, name {string} and address {string}")
-  public void createAndRegisterAnoteBranch(Long code, String name, String address) {
+  public void createAndRegisterAnoteBranch(long code, String name, String address) {
     branch = new Branch(code, name, address);
     branchRegistry.register(branch);
   }
 
   @Given("A closed branch with code {long}, name {string} and address {string}")
-  public void createRegisterAndCloseABranch(Long code, String name, String address) {
+  public void createRegisterAndCloseABranch(long code, String name, String address) {
     branchRegistry = new BranchRegistry();
     branch = new Branch(code, name, address);
     branchRegistry.register(branch);
@@ -34,7 +34,7 @@ public class BranchSteps {
   }
 
   @Then("The branch code should be {long}")
-  public void verifyBranchCode(Long code) {
+  public void verifyBranchCode(long code) {
     assertEquals(branch.getCode(), code);
   }
 
@@ -49,7 +49,7 @@ public class BranchSteps {
   }
 
   @When("I try to register another branch with code {long}, name {string} and address {string}")
-  public void tryToRegisterAnotherBranch(Long code, String name, String address) {
+  public void tryToRegisterAnotherBranch(long code, String name, String address) {
     Branch newBranch = new Branch(code, name, address);
     try {
       branchRegistry.register(newBranch);
@@ -72,7 +72,7 @@ public class BranchSteps {
 
   @Then("The branch should be closed")
   public void verifyBranchClosed() {
-    assertFalse(branch.isOpen());
+    assertFalse(branch.getOpen());
   }
 
   @When("I reopen the branch")
@@ -82,11 +82,11 @@ public class BranchSteps {
 
   @Then("The branch should be reopened")
   public void verifyBranchReOpened() {
-    assertTrue(branch.isOpen());
+    assertTrue(branch.getOpen());
   }
 
   @When("I try to close a branch with code {long} that has not been registered")
-  public void tryToCloseABranchThatHasNotBeenRegistered(Long code) {
+  public void tryToCloseABranchThatHasNotBeenRegistered(long code) {
     try {
       branchRegistry.close(code);
     } catch (Exception exception) {
@@ -95,7 +95,7 @@ public class BranchSteps {
   }
 
   @When("I try to reopen a branch with code {long} that has not been registered")
-  public void tryToReOpenABranchThatHasNotBeenRegistered(Long code) {
+  public void tryToReOpenABranchThatHasNotBeenRegistered(long code) {
     try {
       branchRegistry.reOpen(code);
     } catch (Exception exception) {
@@ -105,7 +105,7 @@ public class BranchSteps {
 
   @Then("The second branch should be registered")
   public void verifySecondBranchRegistered() {
-    ArrayList<Branch> registeredBranches = branchRegistry.getRegisteredBranches();
+    ArrayList<Branch> registeredBranches = branchRegistry.getBranchCodes();
 
     assertEquals(registeredBranches.size(), 2);
   }
@@ -117,20 +117,20 @@ public class BranchSteps {
 
   @And("The second branch should not be registered")
   public void verifySecondBranchNotRegistered() {
-    ArrayList<Branch> registeredBranches = branchRegistry.getRegisteredBranches();
+    ArrayList<Branch> registeredBranches = branchRegistry.getBranchCodes();
 
     assertEquals(registeredBranches.size(), 2);
   }
 
   @And("Both branches should be located at the same address")
   public void verifyBothBranchesShareAdress() {
-    ArrayList<Branch> registeredBranches = branchRegistry.getRegisteredBranches();
+    ArrayList<Branch> registeredBranches = branchRegistry.getBranchCodes();
 
     assertEquals(registeredBranches.get(0).getAddress(), registeredBranches.get(1).getAddress());
   }
 
   @When("I update the branch with code {long} name to {string}")
-  public void updateBranchName(Long code, String name) {
+  public void updateBranchName(long code, String name) {
     try {
       branchRegistry.updateBranchName(code, name);
     } catch (Exception exception) {
@@ -139,7 +139,7 @@ public class BranchSteps {
   }
 
   @And("I update the branch with code {long} address to {string}")
-  public void updateBranchAddress(Long code, String address) {
+  public void updateBranchAddress(long code, String address) {
     try {
       branchRegistry.updateBranchAddress(code, address);
     } catch (Exception exception) {
@@ -153,12 +153,12 @@ public class BranchSteps {
   }
 
   @And("The branch with code {long} name should remain {string}")
-  public void verifyNameOfBranchByCode(Long code, String name) {
+  public void verifyNameOfBranchByCode(long code, String name) {
     assertEquals(branchRegistry.getBranch(code).getName(), name);
   }
 
   @And("The branch with code {long} address should remain {string}")
-  public void verifyAddressOfBranchByCode(Long code, String address) {
+  public void verifyAddressOfBranchByCode(long code, String address) {
     assertEquals(branchRegistry.getBranch(code).getAddress(), address);
   }
 

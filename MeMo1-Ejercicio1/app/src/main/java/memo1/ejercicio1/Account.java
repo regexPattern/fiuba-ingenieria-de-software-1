@@ -19,6 +19,8 @@ public class Account {
       throw new IllegalArgumentException("Branch cannot be null.");
     } else if (owner == null) {
       throw new IllegalArgumentException("Owner cannot be null.");
+    } else if (!branch.getOpen()) {
+      throw new IllegalStateException("Branch cannot be closed.");
     }
 
     this.cbu = cbu;
@@ -38,7 +40,7 @@ public class Account {
     this.balance = balance;
   }
 
-  public Long getCbu() {
+  public long getCbu() {
     return cbu;
   }
 

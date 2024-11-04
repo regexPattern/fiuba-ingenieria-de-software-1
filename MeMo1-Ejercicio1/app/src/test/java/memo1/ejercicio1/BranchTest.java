@@ -9,6 +9,6 @@ class BranchTest {
   void aBranchIsClosedWhenCreated() {
     Branch branch = new Branch(1L, "Suc. Recoleta", "Santa Fe 2000 CABA");
 
-    assertFalse(branch.isOpen());
+    assertFalse(branch.getOpen());
   }
 }

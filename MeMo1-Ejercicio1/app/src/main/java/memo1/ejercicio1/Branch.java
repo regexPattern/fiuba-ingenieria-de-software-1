@@ -1,19 +1,19 @@
 package memo1.ejercicio1;
 
 public class Branch {
-  private Long code;
+  private long code;
   private String name;
   private String address;
-  private Boolean open;
+  private boolean open;
 
-  public Branch(Long code, String name, String address) {
+  public Branch(long code, String name, String address) {
     this.code = code;
     this.name = name;
     this.address = address;
-    this.open = false;
+    this.open = true;
   }
 
-  public Long getCode() {
+  public long getCode() {
     return code;
   }
 
@@ -21,23 +21,23 @@ public class Branch {
     return name;
   }
 
-  public String getAddress() {
-    return address;
-  }
-
-  public void setOpen(boolean open) {
-    this.open = open;
-  }
-
-  public Boolean isOpen() {
-    return open;
-  }
-
   public void setName(String name) {
     this.name = name;
   }
 
+  public String getAddress() {
+    return address;
+  }
+
   public void setAddress(String address) {
     this.address = address;
+  }
+
+  public boolean getOpen() {
+    return open;
+  }
+
+  public void setOpen(boolean open) {
+    this.open = open;
   }
 }

@@ -2,18 +2,86 @@ package memo1.ejercicio1;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
 class AccountRegistryTest {
   @Test
-  void accountRegistryIsCreatedWithNoAccounts() {
+  void defaultConstructorInitializesAccountRegistryWithNoAccounts() {
     AccountRegistry accountRegistry = new AccountRegistry();
 
     assertEquals(accountRegistry.getAccounts().size(), 0);
   }
 
   @Test
-  void registryShouldThrowExceptionWhenTransferingToNonRegisteredAccount() {
+  void constructorRegistersAccountsCorrectly() {
+    Account account1 = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
+    Account account2 = new Account(711312321L, "account2", dummyBranch(), dummyOwner());
+
+    AccountRegistry accountRegistry = new AccountRegistry(account1, account2);
+
+    ArrayList<Account> registeredAccounts = accountRegistry.getAccounts();
+
+    assertEquals(registeredAccounts.size(), 2);
+    assertTrue(registeredAccounts.contains(account1));
+    assertTrue(registeredAccounts.contains(account2));
+  }
+
+  @Test
+  void registeringAccountsToAnAccountRegistry() {
+    AccountRegistry accountRegistry = new AccountRegistry();
+
+    Account account1 = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
+    Account account2 = new Account(711312321L, "account2", dummyBranch(), dummyOwner());
+
+    accountRegistry.register(account1);
+    accountRegistry.register(account2);
+
+    ArrayList<Account> registeredAccounts = accountRegistry.getAccounts();
+
+    assertEquals(registeredAccounts.size(), 2);
+    assertTrue(registeredAccounts.contains(account1));
+    assertTrue(registeredAccounts.contains(account2));
+  }
+
+  @Test
+  void registeringAccountWithRepeatedCbuThrowsException() {
+    AccountRegistry accountRegistry = new AccountRegistry();
+
+    Account account = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
+
+    accountRegistry.register(account);
+
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () ->
+                accountRegistry.register(
+                    new Account(account.getCbu(), "account2", dummyBranch(), dummyOwner())));
+
+    assertEquals(exception.getMessage(), "CBU already in use by another account.");
+  }
+
+  @Test
+  void registeringAccountWithRepeatedAliasThrowsException() {
+    AccountRegistry accountRegistry = new AccountRegistry();
+
+    Account account = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
+
+    accountRegistry.register(account);
+
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () ->
+                accountRegistry.register(
+                    new Account(85712312L, account.getAlias(), dummyBranch(), dummyOwner())));
+
+    assertEquals(exception.getMessage(), "Alias already in use by another account.");
+  }
+
+  @Test
+  void transferingToNonRegisteredAccountThrowsException() {
     AccountRegistry accountRegistry = new AccountRegistry();
 
     Account sender = dummySenderAccount();
@@ -26,19 +94,27 @@ class AccountRegistryTest {
             IllegalArgumentException.class,
             () -> accountRegistry.transfer(sender.getCbu(), receiver.getCbu(), 20.0));
 
-    assertEquals(exception.getMessage(), "Receiver account has not been registered yet.");
+    String expectedMsg = "Receiver account has not been registered yet.";
+
+    assertEquals(exception.getMessage(), expectedMsg);
 
     exception =
         assertThrows(
             IllegalArgumentException.class,
-            () ->
-                accountRegistry.transferFromAccountToAccount(sender.getAlias(), "receiver", 20.0));
+            () -> accountRegistry.transfer(sender.getAlias(), receiver.getAlias(), 20.0));
 
-    assertEquals(exception.getMessage(), "Receiver account does not exist.");
+    assertEquals(exception.getMessage(), expectedMsg);
+
+    exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(sender.getAlias(), null, 20.0));
+
+    assertEquals(exception.getMessage(), expectedMsg);
   }
 
   @Test
-  void registryShouldThrowExceptionWhenTransferingFromNonRegisteredAccount() {
+  void transferingFromNonRegisteredAccountThrowsException() {
     AccountRegistry accountRegistry = new AccountRegistry();
 
     Account sender = dummySenderAccount();
@@ -51,16 +127,23 @@ class AccountRegistryTest {
             IllegalArgumentException.class,
             () -> accountRegistry.transfer(sender.getCbu(), receiver.getCbu(), 20.0));
 
-    assertEquals(exception.getMessage(), "Sender account has not been registered yet.");
+    String expectedMsg = "Sender account has not been registered yet.";
+
+    assertEquals(exception.getMessage(), expectedMsg);
 
     exception =
         assertThrows(
             IllegalArgumentException.class,
-            () ->
-                accountRegistry.transferFromAccountToAccount(
-                    "receiver", receiver.getAlias(), 20.0));
+            () -> accountRegistry.transfer(sender.getAlias(), receiver.getAlias(), 20.0));
 
-    assertEquals(exception.getMessage(), "Sender account has not been registered yet.");
+    assertEquals(exception.getMessage(), expectedMsg);
+
+    exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(null, receiver.getAlias(), 20.0));
+
+    assertEquals(exception.getMessage(), expectedMsg);
   }
 
   private Branch dummyBranch() {

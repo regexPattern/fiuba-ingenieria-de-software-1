@@ -16,7 +16,7 @@ public class ClientRegistry {
     return new ArrayList<>(registeredClients.values());
   }
 
-  public Client unregisterClient(Long dni) {
+  public Client unregisterClient(long dni) {
     return registeredClients.remove(dni);
   }
 }

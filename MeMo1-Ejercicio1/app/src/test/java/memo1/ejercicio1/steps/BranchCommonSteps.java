@@ -17,7 +17,7 @@ public class BranchCommonSteps {
   }
 
   @Given("A branch with code {long}, name {string} and address {string}")
-  public void createBranch(Long code, String name, String address) {
+  public void createBranch(long code, String name, String address) {
     branch = new Branch(code, name, address);
   }
 }

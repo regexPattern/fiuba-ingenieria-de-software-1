@@ -9,12 +9,17 @@ public class AccountRegistry {
   private HashMap<Long, Account> accountsByCbu = new HashMap<>();
   private HashMap<String, Account> accountsByAlias = new HashMap<>();
 
+  public AccountRegistry(Account... accounts) {
+    for (Account acc : accounts) {
+      register(acc);
+    }
+  }
+
   public void register(Account account) {
     if (accountsByCbu.containsKey(account.getCbu())) {
-      throw new IllegalStateException("There is an account already registerd with the same CBU.");
+      throw new IllegalStateException("CBU already in use by another account.");
     } else if (accountsByAlias.containsKey(account.getAlias())) {
-      throw new IllegalStateException(
-          "There is an account already registered with the same alias.");
+      throw new IllegalStateException("Alias already in use by another account.");
     }
 
     accounts.add(account);
@@ -26,20 +31,21 @@ public class AccountRegistry {
     return new ArrayList<>(accounts);
   }
 
-  public Transaction transfer(Long senderCbu, Long receiverCbu, Double amount) {
+  public Transaction transfer(long senderCbu, long receiverCbu, double amount) {
     Account sender = accountsByCbu.get(senderCbu);
     Account receiver = accountsByCbu.get(receiverCbu);
+
     return transfer(sender, receiver, amount);
   }
 
-  public Transaction transferFromAccountToAccount(
-      String senderAlias, String receiverAlias, Double amount) {
+  public Transaction transfer(String senderAlias, String receiverAlias, double amount) {
     Account sender = accountsByAlias.get(senderAlias);
     Account receiver = accountsByAlias.get(receiverAlias);
+
     return transfer(sender, receiver, amount);
   }
 
-  private Transaction transfer(Account sender, Account receiver, Double amount) {
+  private Transaction transfer(Account sender, Account receiver, double amount) {
     if (sender == null) {
       throw new IllegalArgumentException("Sender account has not been registered yet.");
     } else if (receiver == null) {
