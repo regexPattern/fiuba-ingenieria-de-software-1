@@ -90,12 +90,12 @@ class AccountTest {
 
     Exception exception =
         assertThrows(
-            IllegalArgumentException.class,
+            IllegalStateException.class,
             () ->
                 new Account(
                     123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
 
-    assertEquals(exception.getMessage(), "Branch cannot be null.");
+    assertEquals(exception.getMessage(), "Branch cannot be closed.");
   }
 
   @Test
