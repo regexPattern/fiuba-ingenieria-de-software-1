@@ -14,20 +14,6 @@ class AccountRegistryTest {
   }
 
   @Test
-  void constructorRegistersAccountsCorrectly() {
-    Account account1 = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
-    Account account2 = new Account(711312321L, "account2", dummyBranch(), dummyOwner());
-
-    AccountRegistry accountRegistry = new AccountRegistry(account1, account2);
-
-    ArrayList<Account> registeredAccounts = accountRegistry.getAccounts();
-
-    assertEquals(registeredAccounts.size(), 2);
-    assertTrue(registeredAccounts.contains(account1));
-    assertTrue(registeredAccounts.contains(account2));
-  }
-
-  @Test
   void registeringAccountsToAnAccountRegistry() {
     AccountRegistry accountRegistry = new AccountRegistry();
 

@@ -9,12 +9,6 @@ public class AccountRegistry {
   private HashMap<Long, Account> accountsByCbu = new HashMap<>();
   private HashMap<String, Account> accountsByAlias = new HashMap<>();
 
-  public AccountRegistry(Account... accounts) {
-    for (Account acc : accounts) {
-      register(acc);
-    }
-  }
-
   public void register(Account account) {
     if (accountsByCbu.containsKey(account.getCbu())) {
       throw new IllegalStateException("CBU already in use by another account.");
