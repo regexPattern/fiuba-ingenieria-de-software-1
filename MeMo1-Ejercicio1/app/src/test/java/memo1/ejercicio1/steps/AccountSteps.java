@@ -149,7 +149,7 @@ public class AccountSteps {
         () -> new Account(cbu, alias, branch, new Client(ownerDni, "Some name", "Some surname")));
   }
 
-  @And("The account should not be registered")
+  @And("The account should not be created")
   public void verifyAccountNotRegistered() {
     assertEquals(accountRegistry.getAccounts().size(), 0);
   }

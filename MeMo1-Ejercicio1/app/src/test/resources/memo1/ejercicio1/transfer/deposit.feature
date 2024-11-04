@@ -1,4 +1,5 @@
-Feature: Depositing money
+# HDU: https://github.com/regexPattern/2024_2C_108535_Ejercicio1/issues/9
+Feature: Depositing funds
   Scenario: Successfully deposit money into an account
     Given An account with CBU 123456789, alias "account" and a balance of 1000.0
     When I deposit 200.0 into the account

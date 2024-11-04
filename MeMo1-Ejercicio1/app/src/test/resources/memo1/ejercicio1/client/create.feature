@@ -1,3 +1,4 @@
+# HDU: https://github.com/regexPattern/2024_2C_108535_Ejercicio1/issues/6
 Feature: Create a client
   Scenario: Correctly create a client
     Given I create a client with DNI 123456789, name "Carlos", surname "Castillo", birth date "10/09/2001" and address "Paseo Colón 950"

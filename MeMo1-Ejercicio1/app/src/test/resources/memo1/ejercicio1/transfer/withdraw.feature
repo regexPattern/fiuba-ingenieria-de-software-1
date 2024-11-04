@@ -1,4 +1,5 @@
-Feature: Withdrawing money
+# HDU: https://github.com/regexPattern/2024_2C_108535_Ejercicio1/issues/10
+Feature: Withdrawing funds
   Scenario: Successfully withdraw money when the balance is sufficient
     Given An account with CBU 123456789, alias "account" and a balance of 1000.0
     When I withdraw 300.0 from the account
