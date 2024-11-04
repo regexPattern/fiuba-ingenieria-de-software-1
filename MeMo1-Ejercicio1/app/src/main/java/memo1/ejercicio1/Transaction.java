@@ -3,41 +3,36 @@ package memo1.ejercicio1;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
 import java.util.UUID;
 
-public class TransferLog {
-  private UUID correlativeCode;
+public class Transaction {
+  private UUID code;
   private String type;
   private Double amount;
   private LocalDateTime dateTime;
-  private HashSet<Long> associatedAccountsCbus = new HashSet<>();
+  private Account sender;
+  private Account receiver;
 
-  private TransferLog(String type, Double amount) {
+  public Transaction(String type, Double amount, Account account) {
+    this(type, amount, account, account);
+  }
+
+  public Transaction(String type, Double amount, Account sender, Account receiver) {
     if (!(type == "transfer" || type == "deposit" || type == "withdrawal")) {
       throw new IllegalArgumentException(
           "Unsupported transfer type (supported types: 'transfer', 'deposit', 'withdrawal')");
     }
 
+    this.code = UUID.randomUUID();
     this.type = type;
     this.amount = amount;
-    this.correlativeCode = UUID.randomUUID();
     this.dateTime = LocalDateTime.now();
+    this.sender = sender;
+    this.receiver = receiver;
   }
 
-  public TransferLog(String type, Double amount, Account account) {
-    this(type, amount);
-    this.associatedAccountsCbus.add(account.getCbu());
-  }
-
-  public TransferLog(String type, Double amount, Account sender, Account receiver) {
-    this(type, amount);
-    this.associatedAccountsCbus.add(sender.getCbu());
-    this.associatedAccountsCbus.add(receiver.getCbu());
-  }
-
-  public UUID getCorrelativeCode() {
-    return correlativeCode;
+  public UUID getCode() {
+    return code;
   }
 
   public LocalDate getDate() {
@@ -56,7 +51,11 @@ public class TransferLog {
     return amount;
   }
 
-  public HashSet<Long> getAssociatedAccountsCbus() {
-    return associatedAccountsCbus;
+  public Account getSender() {
+    return sender;
+  }
+
+  public Account getReceiver() {
+    return receiver;
   }
 }

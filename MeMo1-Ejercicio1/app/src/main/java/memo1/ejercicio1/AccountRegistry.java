@@ -5,49 +5,49 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class AccountRegistry {
-  private HashSet<Account> registeredAccounts = new HashSet<>();
-  private HashMap<Long, Account> registeredAccountsByCbu = new HashMap<>();
-  private HashMap<String, Account> registeredAccountsByAlias = new HashMap<>();
+  private HashSet<Account> accounts = new HashSet<>();
+  private HashMap<Long, Account> accountsByCbu = new HashMap<>();
+  private HashMap<String, Account> accountsByAlias = new HashMap<>();
 
-  public void registerAccount(Account account, Branch branch) {
-    if (registeredAccountsByCbu.containsKey(account.getCbu())) {
+  public void register(Account account) {
+    if (accountsByCbu.containsKey(account.getCbu())) {
       throw new IllegalStateException("There is an account already registerd with the same CBU.");
-    } else if (registeredAccountsByAlias.containsKey(account.getAlias())) {
+    } else if (accountsByAlias.containsKey(account.getAlias())) {
       throw new IllegalStateException(
           "There is an account already registered with the same alias.");
     }
 
-    account.setBranch(branch);
-    registeredAccounts.add(account);
-    registeredAccountsByCbu.put(account.getCbu(), account);
-    registeredAccountsByAlias.put(account.getAlias(), account);
+    accounts.add(account);
+    accountsByCbu.put(account.getCbu(), account);
+    accountsByAlias.put(account.getAlias(), account);
   }
 
-  public ArrayList<Account> getRegisteredAccounts() {
-    return new ArrayList<>(registeredAccounts);
+  public ArrayList<Account> getAccounts() {
+    return new ArrayList<>(accounts);
   }
 
-  private TransferLog transferFromAccountToAccount(
-      Account sender, Account receiver, Double amount) {
+  public Transaction transfer(Long senderCbu, Long receiverCbu, Double amount) {
+    Account sender = accountsByCbu.get(senderCbu);
+    Account receiver = accountsByCbu.get(receiverCbu);
+    return transfer(sender, receiver, amount);
+  }
+
+  public Transaction transferFromAccountToAccount(
+      String senderAlias, String receiverAlias, Double amount) {
+    Account sender = accountsByAlias.get(senderAlias);
+    Account receiver = accountsByAlias.get(receiverAlias);
+    return transfer(sender, receiver, amount);
+  }
+
+  private Transaction transfer(Account sender, Account receiver, Double amount) {
     if (sender == null) {
-      throw new IllegalArgumentException("Sender account does not exist.");
+      throw new IllegalArgumentException("Sender account has not been registered yet.");
     } else if (receiver == null) {
-      throw new IllegalArgumentException("Receiver account does not exist.");
+      throw new IllegalArgumentException("Receiver account has not been registered yet.");
     }
 
     return sender.transfer(receiver, amount);
   }
 
-  public TransferLog transferFromAccountToAccount(Long senderCbu, Long receiverCbu, Double amount) {
-    Account sender = registeredAccountsByCbu.get(senderCbu);
-    Account receiver = registeredAccountsByCbu.get(receiverCbu);
-    return transferFromAccountToAccount(sender, receiver, amount);
-  }
-
-  public TransferLog transferFromAccountToAccount(
-      String senderAlias, String receiverAlias, Double amount) {
-    Account sender = registeredAccountsByAlias.get(senderAlias);
-    Account receiver = registeredAccountsByAlias.get(receiverAlias);
-    return transferFromAccountToAccount(sender, receiver, amount);
-  }
+  // TODO: Acá también tengo que manejar todo lo de account deletion.
 }

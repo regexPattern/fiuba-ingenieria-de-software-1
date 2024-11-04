@@ -7,38 +7,21 @@ import java.util.Objects;
 public class Account {
   private Long cbu;
   private String alias;
-  private double balance;
+  private Branch branch;
   private Client owner;
   private HashSet<Client> coOwners = new HashSet<>();
-  private Branch branch;
+  private Double balance;
 
-  public Account(Long cbu, String alias) {
+  public Account(Long cbu, String alias, Branch branch, Client owner) {
     this.cbu = cbu;
     this.alias = alias;
+    this.branch = branch;
+    this.owner = owner;
   }
 
-  public Account(Long cbu, String alias, double balance) {
-    this(cbu, alias);
-    setBalance(balance);
-  }
+  public Account(Long cbu, String alias, Branch branch, Client owner, Double balance) {
+    this(cbu, alias, branch, owner);
 
-  public Long getCbu() {
-    return cbu;
-  }
-
-  public void setCbu(Long cbu) {
-    this.cbu = cbu;
-  }
-
-  public String getAlias() {
-    return alias;
-  }
-
-  public double getBalance() {
-    return balance;
-  }
-
-  public void setBalance(double balance) {
     if (balance < 0) {
       throw new IllegalArgumentException("Balance cannot be negative.");
     }
@@ -46,7 +29,36 @@ public class Account {
     this.balance = balance;
   }
 
-  public TransferLog withdraw(double amount) {
+  public Long getCbu() {
+    return cbu;
+  }
+
+  // TODO: Tambien voy a necesitar una de update alias, pero que solo pueda ser
+  // utilizada de manera interna para comprobar las colisiones. Probablemente
+  // me convenga unifcar todo en una solo interfaz, para consistencia en como
+  // seteo y geteo las props.
+  public String getAlias() {
+    return alias;
+  }
+
+  public Double getBalance() {
+    return balance;
+  }
+
+  public Transaction transfer(Account receiver, Double amount) {
+    if (receiver == null) {
+      throw new IllegalArgumentException("Receiver account cannot be null.");
+    } else if (receiver.equals(this)) {
+      throw new IllegalArgumentException("Receiver account cannot be same as sender.");
+    }
+
+    withdraw(amount);
+    receiver.deposit(amount);
+
+    return new Transaction("transfer", amount, this, receiver);
+  }
+
+  public Transaction withdraw(Double amount) {
     if (amount <= 0) {
       throw new IllegalArgumentException("Amount cannot be negative.");
     } else if (amount > balance) {
@@ -55,33 +67,20 @@ public class Account {
 
     balance -= amount;
 
-    return new TransferLog("withdrawal", amount, this);
+    return new Transaction("withdrawal", amount, this);
   }
 
-  public TransferLog deposit(double amount) {
+  public Transaction deposit(Double amount) {
     if (amount < 0) {
       throw new IllegalArgumentException("Amount has to be positive.");
     }
 
     balance += amount;
 
-    return new TransferLog("deposit", amount, this);
+    return new Transaction("deposit", amount, this);
   }
 
-  public TransferLog transfer(Account receiver, double amount) {
-    if (receiver == null) {
-      throw new IllegalArgumentException("Receiver account cannot be null.");
-    } else if (receiver.getCbu() == getCbu()) {
-      throw new IllegalArgumentException("Receiver account cannot be same as sender.");
-    }
-
-    withdraw(amount);
-    receiver.deposit(amount);
-
-    return new TransferLog("transfer", amount, this, receiver);
-  }
-
-  public void setOwner(Client client) {
+  void setOwner(Client client) {
     if (owner != null) {
       throw new IllegalStateException("Cannot assign multiple owners.");
     }
@@ -93,6 +92,9 @@ public class Account {
     return owner;
   }
 
+  // TODO: Tendria que tener algun test que me diga si puedo volver a agregar
+  // co-owners que ya son co-owners. Realmente esto si funciona porque tengo un
+  // hashset, pero eso es implementacion interna.
   public void setCoOwner(Client client) {
     if (client == owner) {
       throw new IllegalStateException("Account owner cannot be set as co-owner.");
@@ -105,6 +107,8 @@ public class Account {
     return new ArrayList<>(coOwners);
   }
 
+  // TODO: Este metodo deberia existir pero solo para uso interno por parte del
+  // account manager o del branch manager.
   public void setBranch(Branch branch) {
     this.branch = branch;
   }

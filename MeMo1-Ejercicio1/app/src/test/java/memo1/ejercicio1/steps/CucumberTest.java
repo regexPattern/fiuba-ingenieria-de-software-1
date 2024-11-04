@@ -1,4 +1,4 @@
-package memo1.ejercicio;
+package memo1.ejercicio1.steps;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;

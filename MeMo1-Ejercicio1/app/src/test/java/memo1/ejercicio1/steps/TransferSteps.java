@@ -3,32 +3,35 @@ package memo1.ejercicio1.steps;
 import static org.junit.Assert.*;
 
 import io.cucumber.java.en.*;
-import java.util.HashSet;
 import memo1.ejercicio1.*;
 
 public class TransferSteps {
   private Account sender;
   private Account receiver;
   private Exception operationResult;
-  private TransferLog transferLog;
+  private Transaction transaction;
 
   @Given("A sender account with CBU {long}, alias {string} and a balance of {double}")
   public void createSenderAccount(Long cbu, String alias, double balance) {
-    sender = new Account(cbu, alias, balance);
+    sender =
+        new Account(
+            cbu, alias, new Branch(1, "", ""), new Client(123456789L, "", ""), balance); // TODO
   }
 
   @And("A receiver account with CBU {long}, alias {string} and a balance of {double}")
   public void createReceiverAccount(Long cbu, String alias, double balance) {
-    receiver = new Account(cbu, alias, balance);
+    receiver =
+        new Account(
+            cbu, alias, new Branch(1, "", ""), new Client(123456789L, "", ""), balance); // TODO
   }
 
   @When("I transfer {double} from the sender account into the receiver account")
   public void transferFromSenderToReceiver(double amount) {
     operationResult = null;
-    transferLog = null;
+    transaction = null;
 
     try {
-      transferLog = sender.transfer(receiver, amount);
+      transaction = sender.transfer(receiver, amount);
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -36,12 +39,12 @@ public class TransferSteps {
 
   @Then("The transfer should be logged")
   public void verifyTransferLogged() {
-    assertNotNull(transferLog);
+    assertNotNull(transaction);
   }
 
   @Then("The transfer should not be logged")
   public void verifyTransferNotLogged() {
-    assertNull(transferLog);
+    assertNull(transaction);
   }
 
   @Then("The sender account balance should be {double}")
@@ -73,35 +76,32 @@ public class TransferSteps {
 
   @And("The transfer log should have a correlative code")
   public void verifyLogHasCorrelativeCode() {
-    assertNotNull(transferLog.getCorrelativeCode());
+    assertNotNull(transaction.getCode());
   }
 
   @And("The transfer log should have a date")
   public void verifyLogHasDate() {
-    assertNotNull(transferLog.getDate());
+    assertNotNull(transaction.getDate());
   }
 
   @And("The transfer log should have a time")
   public void verifyLogHasTime() {
-    assertNotNull(transferLog.getTime());
+    assertNotNull(transaction.getTime());
   }
 
   @And("The logged transfer type should be {string}")
   public void verifyLogType(String type) {
-    assertEquals(transferLog.getType(), type);
+    assertEquals(transaction.getType(), type);
   }
 
   @And("The logged transfered amount should be {double}")
   public void verifyLoggedAmount(Double amount) {
-    assertEquals(transferLog.getAmount(), amount);
+    assertEquals(transaction.getAmount(), amount);
   }
 
   @And("The transfer log should be associated with the given accounts")
   public void verifyTwoAssociatedAccounts() {
-    HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
-
-    assertEquals(associatedAccountsCbus.size(), 2);
-    assertTrue(associatedAccountsCbus.contains(sender.getCbu()));
-    assertTrue(associatedAccountsCbus.contains(receiver.getCbu()));
+    assertEquals(transaction.getSender().getCbu(), sender.getCbu());
+    assertEquals(transaction.getReceiver().getCbu(), receiver.getCbu());
   }
 }

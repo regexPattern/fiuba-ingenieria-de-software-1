@@ -1,36 +1,44 @@
 package memo1.ejercicio1.steps;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-import io.cucumber.java.en.*;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import java.util.ArrayList;
-import java.util.HashSet;
-import memo1.ejercicio1.*;
+import memo1.ejercicio1.Account;
+import memo1.ejercicio1.AccountRegistry;
+import memo1.ejercicio1.Branch;
+import memo1.ejercicio1.Client;
+import memo1.ejercicio1.Transaction;
 
 public class AccountSteps {
   private Account account;
   private AccountRegistry accountRegistry;
   private Exception operationResult;
-  private TransferLog transferLog;
+  private Transaction transference;
 
   @Given("I create an account with CBU {long} and alias {string}")
   public void createAccountWithDefaultBalance(long cbu, String alias) {
-    account = new Account(cbu, alias);
+    account = new Account(cbu, alias, new Branch(1, "", ""), new Client(1234L, "", "")); // TODO
   }
 
   @Given("I create an account with CBU {long}, alias {string} and a balance of {double}")
   @Given("An account with CBU {long}, alias {string} and a balance of {double}")
   public void createAccountWithInitialBalance(long cbu, String alias, double balance) {
-    account = new Account(cbu, alias, balance);
+    account =
+        new Account(cbu, alias, new Branch(1, "", ""), new Client(1234L, "", ""), balance); // TODO
   }
 
   @When("I deposit {double} into the account")
   public void depositIntoAccount(double amount) {
     operationResult = null;
-    transferLog = null;
+    transference = null;
 
     try {
-      transferLog = account.deposit(amount);
+      transference = account.deposit(amount);
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -39,10 +47,10 @@ public class AccountSteps {
   @When("I try to deposit {double} into the account")
   public void tryToDepositIntoAccount(double amount) {
     operationResult = null;
-    transferLog = null;
+    transference = null;
 
     try {
-      transferLog = account.deposit(amount);
+      transference = account.deposit(amount);
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -51,10 +59,10 @@ public class AccountSteps {
   @When("I withdraw {double} from the account")
   public void withdrawFromAccount(double amount) {
     operationResult = null;
-    transferLog = null;
+    transference = null;
 
     try {
-      transferLog = account.withdraw(amount);
+      transference = account.withdraw(amount);
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -63,10 +71,10 @@ public class AccountSteps {
   @When("I try to withdraw {double} from the account")
   public void tryToWithdrawFromAccount(double amount) {
     operationResult = null;
-    transferLog = null;
+    transference = null;
 
     try {
-      transferLog = account.withdraw(amount);
+      transference = account.withdraw(amount);
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -99,23 +107,25 @@ public class AccountSteps {
 
   @And("The log should be associated with the given account")
   public void verifyOneAssociatedAccount() {
-    HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+    Account sender = transference.getSender();
+    Account receiver = transference.getReceiver();
 
-    assertEquals(associatedAccountsCbus.size(), 1);
-    assertTrue(associatedAccountsCbus.contains(account.getCbu()));
+    assertEquals(sender, account);
+    assertEquals(receiver, account);
   }
 
   @Given("An account with CBU {long} and alias {string}")
   public void createAccountWithCbuAndAlias(Long cbu, String alias) {
     accountRegistry = new AccountRegistry();
-    account = new Account(cbu, alias);
-    accountRegistry.registerAccount(account, dummyBranch());
+    account = new Account(cbu, alias, new Branch(1, "", ""), new Client(123L, "", "")); // TODO
+    accountRegistry.register(account);
   }
 
   @When("I try to create an account with CBU {long} and alias {string}")
   public void tryToCreateAnotherAccountWithCbuAndAlias(Long cbu, String alias) {
     try {
-      accountRegistry.registerAccount(new Account(cbu, alias), dummyBranch());
+      accountRegistry.register(
+          new Account(cbu, alias, new Branch(1, "", ""), new Client(1L, "", "")));
     } catch (Exception exception) {
       operationResult = exception;
     }
@@ -123,7 +133,7 @@ public class AccountSteps {
 
   @And("The second account should not be registered")
   public void verifyOnlyOneAccountRegistered() {
-    ArrayList<Account> registeredAccounts = accountRegistry.getRegisteredAccounts();
+    ArrayList<Account> registeredAccounts = accountRegistry.getAccounts();
 
     assertEquals(registeredAccounts.size(), 1);
     assertEquals(registeredAccounts.get(0), account);
@@ -132,35 +142,31 @@ public class AccountSteps {
   @Then("The deposit should be logged")
   @Then("The withdrawal should be logged")
   public void verifyTransferLogged() {
-    assertNotNull(transferLog);
+    assertNotNull(transference);
   }
 
   @And("The log should have a correlative code")
   public void verifyLogHasCorrelativeCode() {
-    assertNotNull(transferLog.getCorrelativeCode());
+    assertNotNull(transference.getCode());
   }
 
   @And("The log should have a date")
   public void verifyLogHasDate() {
-    assertNotNull(transferLog.getDate());
+    assertNotNull(transference.getDate());
   }
 
   @And("The log should have a time")
   public void verifyLogHasTime() {
-    assertNotNull(transferLog.getTime());
+    assertNotNull(transference.getTime());
   }
 
   @And("The logged type should be {string}")
   public void verifyLogType(String type) {
-    assertEquals(transferLog.getType(), type);
+    assertEquals(transference.getType(), type);
   }
 
   @And("The logged amount should be {double}")
   public void verifyLoggedAmount(Double amount) {
-    assertEquals(transferLog.getAmount(), amount);
-  }
-
-  private static Branch dummyBranch() {
-    return new Branch(001, "Suc. Belgrano", "Cabildo 1000 CABA");
+    assertEquals(transference.getAmount(), amount);
   }
 }
