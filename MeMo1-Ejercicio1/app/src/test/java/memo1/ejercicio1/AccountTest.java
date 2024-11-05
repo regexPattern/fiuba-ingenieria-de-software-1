@@ -183,14 +183,16 @@ class AccountTest {
   }
 
   @Test
-  void settingAlreadySetCoOwnerLeavesCoOwnersListTheSame() {
+  void settingAlreadySetCoOwnerThrowsException() {
     Account account = dummyAccount();
 
     Client coOwner = new Client(98765421L, "Wendollin", "Hernández");
 
     account.setCoOwner(coOwner);
-    account.setCoOwner(coOwner);
 
+    Exception exception = assertThrows(IllegalStateException.class, () -> account.setCoOwner(coOwner));
+
+    assertEquals(exception.getMessage(), "Client is already an account co-owner.");
     assertEquals(account.getCoOwners().size(), 1);
   }
 

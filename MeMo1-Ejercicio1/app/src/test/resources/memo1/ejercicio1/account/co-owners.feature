@@ -8,9 +8,8 @@ Feature: Adding account co-owners
     And The client with DNI 96113425 should still be the account owner
 
   Scenario: Cannot set the account owner as a co-owner
-    Given A client with DNI 96113425, name "Carlos" and surname "Castillo"
-    And An account with CBU 123456789, alias "account1", branch with code 1 and owner with DNI 96113425
-    When I try to set the client with DNI 96113425 as one of the account co-owners
+    Given An account with CBU 123456789, alias "account1", branch with code 1 and owner with DNI 96113425
+    When I try to set the account owner as one of the account co-owners
     Then The operation should be denied
     And The client with DNI 96113425 should still be the account owner
     And The account co-owners should remain the same

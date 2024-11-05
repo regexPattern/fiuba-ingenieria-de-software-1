@@ -26,6 +26,8 @@ public class AccountSteps {
   private AccountRegistry accountRegistry;
   private Branch branch;
   private ArrayList<Account> prevAccounts;
+  private Client coOwner;
+  private ArrayList<Client> prevCoOwners;
 
   public AccountSteps(
       BranchCommonSteps branchSteps,
@@ -208,5 +210,44 @@ public class AccountSteps {
   public void unRegisterNotRegisteredAccount(long cbu) {
     prevAccounts = accountRegistry.getAccounts();
     operationResultSteps.execute(() -> accountRegistry.unRegister(cbu));
+  }
+
+  @When("I add client with DNI {long}, name {string} and surname {string} as one of the account co-owners")
+  public void createClientAsAccountCoOwner(long dni, String name, String surName) {
+    coOwner = new Client(dni, name, surName);
+    account1.setCoOwner(coOwner);
+  }
+
+  @Then("The client with DNI {long} should be one of the account co-owners")
+  public void verifyAccountCoOwner(long dni) {
+    assertTrue(account1.getCoOwners().contains(coOwner));
+  }
+
+  @And("The client with DNI {long} should still be the account owner")
+  public void verifyAccountOwner(long dni) {
+    assertEquals(account1.getOwner().getDni(), dni);
+  }
+
+  @When("I try to set the account owner as one of the account co-owners")
+  public void setOwnerAsCoOwner() {
+    prevCoOwners = account1.getCoOwners();
+    operationResultSteps.execute(() -> account1.setCoOwner(account1.getOwner()));
+  }
+
+  @And("The account co-owners should remain the same")
+  public void verifyAccountCoOwnersRemainTheSame() {
+    assertEquals(account1.getCoOwners(), prevCoOwners);
+  }
+
+  @And("A client with DNI {long}, name {string} and surname {string} who is one of the account co-owners")
+  public void createClientAsCoOwner(long dni, String name, String surName) {
+    coOwner = new Client(dni, name, surName);
+    account1.setCoOwner(coOwner);
+  }
+
+  @When("I try to set the client with DNI {long} as one of the account co-owners")
+  public void setClientAsCoOwner(long dni) {
+    prevCoOwners = account1.getCoOwners();
+    operationResultSteps.execute(() -> account1.setCoOwner(coOwner));
   }
 }

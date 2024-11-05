@@ -127,6 +127,8 @@ public class Account {
       throw new IllegalArgumentException("New co-owner cannot be null.");
     } else if (client.equals(owner)) {
       throw new IllegalStateException("Account owner cannot be set as co-owner.");
+    } else if (coOwners.contains(client)) {
+      throw new IllegalStateException("Client is already an account co-owner.");
     }
 
     coOwners.add(client);
