@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.Test;
 
 class AccountTest {
@@ -26,12 +29,11 @@ class AccountTest {
 
   @Test
   void constructorInitializesBalanceToZero() {
-    Account account =
-        new Account(
-            123456789L,
-            "account",
-            new Branch(1L, "Branch 1", "Paseo Colón 950"),
-            new Client(96113425L, "Carlos", "Castillo"));
+    Account account = new Account(
+        123456789L,
+        "account",
+        new Branch(1L, "Branch 1", "Paseo Colón 950"),
+        new Client(96113425L, "Carlos", "Castillo"));
 
     assertEquals(account.getBalance(), 0.0);
   }
@@ -40,13 +42,12 @@ class AccountTest {
   void constructorSetsBalanceCorrectly() {
     Double balance = 56471.2;
 
-    Account account =
-        new Account(
-            123456789L,
-            "account",
-            new Branch(1L, "Branch 1", "Paseo Colón 950"),
-            new Client(96113425L, "Carlos", "Castillo"),
-            balance);
+    Account account = new Account(
+        123456789L,
+        "account",
+        new Branch(1L, "Branch 1", "Paseo Colón 950"),
+        new Client(96113425L, "Carlos", "Castillo"),
+        balance);
 
     assertEquals(account.getBalance(), balance);
   }
@@ -55,15 +56,13 @@ class AccountTest {
   void constructorThrowsExceptionIfAliasIsNull() {
     String alias = null;
 
-    Exception exception =
-        assertThrows(
-            IllegalArgumentException.class,
-            () ->
-                new Account(
-                    123456789L,
-                    alias,
-                    new Branch(1L, "Branch 1", "Paseo Colón 950"),
-                    new Client(96113425L, "Carlos", "Castillo")));
+    Exception exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> new Account(
+            123456789L,
+            alias,
+            new Branch(1L, "Branch 1", "Paseo Colón 950"),
+            new Client(96113425L, "Carlos", "Castillo")));
 
     assertEquals(exception.getMessage(), "Alias cannot be null.");
   }
@@ -72,12 +71,10 @@ class AccountTest {
   void constructorThrowsExceptionIfBranchIsNull() {
     Branch branch = null;
 
-    Exception exception =
-        assertThrows(
-            IllegalArgumentException.class,
-            () ->
-                new Account(
-                    123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
+    Exception exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> new Account(
+            123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
 
     assertEquals(exception.getMessage(), "Branch cannot be null.");
   }
@@ -88,12 +85,10 @@ class AccountTest {
 
     branch.setOpen(false);
 
-    Exception exception =
-        assertThrows(
-            IllegalStateException.class,
-            () ->
-                new Account(
-                    123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
+    Exception exception = assertThrows(
+        IllegalStateException.class,
+        () -> new Account(
+            123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
 
     assertEquals(exception.getMessage(), "Branch cannot be closed.");
   }
@@ -102,12 +97,10 @@ class AccountTest {
   void constructorThrowsExceptionIfOwnerIsNull() {
     Client owner = null;
 
-    Exception exception =
-        assertThrows(
-            IllegalArgumentException.class,
-            () ->
-                new Account(
-                    123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner));
+    Exception exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> new Account(
+            123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner));
 
     assertEquals(exception.getMessage(), "Owner cannot be null.");
   }
@@ -116,16 +109,14 @@ class AccountTest {
   void constructorThrowsExceptionIfBalanceIsNegative() {
     Double balance = -50.0;
 
-    Exception exception =
-        assertThrows(
-            IllegalArgumentException.class,
-            () ->
-                new Account(
-                    123456789L,
-                    "account",
-                    new Branch(1L, "Branch 1", "Paseo Colón 950"),
-                    new Client(96113425L, "Carlos", "Castillo"),
-                    balance));
+    Exception exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> new Account(
+            123456789L,
+            "account",
+            new Branch(1L, "Branch 1", "Paseo Colón 950"),
+            new Client(96113425L, "Carlos", "Castillo"),
+            balance));
 
     assertEquals(exception.getMessage(), "Balance cannot be negative.");
   }
@@ -135,8 +126,7 @@ class AccountTest {
     Client owner = new Client(98765421L, "Carlos", "Castillo");
     Client newOwner = new Client(11231232L, "Eduardo", "Pereira");
 
-    Account account =
-        new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
+    Account account = new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
 
     account.setOwner(newOwner);
 
@@ -148,8 +138,7 @@ class AccountTest {
     Client owner = new Client(98765421L, "Carlos", "Castillo");
     Client newOwner = new Client(11231232L, "Eduardo", "Pereira");
 
-    Account account =
-        new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
+    Account account = new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
 
     account.setOwner(newOwner);
 
@@ -161,8 +150,7 @@ class AccountTest {
   void settingNullOwnerThrowsException() {
     Account account = dummyAccount();
 
-    Exception exception =
-        assertThrows(IllegalArgumentException.class, () -> account.setOwner(null));
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> account.setOwner(null));
 
     assertEquals(exception.getMessage(), "New owner cannot be null.");
   }
@@ -171,8 +159,7 @@ class AccountTest {
   void settingNullCoOwnerThrowsException() {
     Account account = dummyAccount();
 
-    Exception exception =
-        assertThrows(IllegalArgumentException.class, () -> account.setCoOwner(null));
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> account.setCoOwner(null));
 
     assertEquals(exception.getMessage(), "New co-owner cannot be null.");
   }
@@ -211,10 +198,42 @@ class AccountTest {
   void settingOwnerAsCoOwnerThrowsException() {
     Account account = dummyAccount();
 
-    Exception exception =
-        assertThrows(IllegalStateException.class, () -> account.setCoOwner(account.getOwner()));
+    Exception exception = assertThrows(IllegalStateException.class, () -> account.setCoOwner(account.getOwner()));
 
     assertEquals(exception.getMessage(), "Account owner cannot be set as co-owner.");
+  }
+
+  @Test
+  void settingAccountAliasToAvailableAlias() {
+    Account account = dummyAccount();
+    String[] takenAliases = { "otherAlias1", "otherAlias2" };
+
+    String alias = "differentAlias1";
+    account.setAlias(alias, Arrays.asList(takenAliases));
+
+    assertEquals(account.getAlias(), alias);
+  }
+
+  @Test
+  void settingAccountAliasToAnAlreadyTakenAlias() {
+    Account account = dummyAccount();
+    String[] takenAliases = { "otherAlias1", "otherAlias2" };
+
+    Exception exception = assertThrows(IllegalStateException.class,
+        () -> account.setAlias(takenAliases[0], Arrays.asList(takenAliases)));
+
+    assertEquals(exception.getMessage(), "Alias already in use by another account.");
+  }
+
+  @Test
+  void settingAccountAliasToTheSameAliasThrowsException() {
+    Account account = dummyAccount();
+    String[] takenAliases = {};
+
+    Exception exception = assertThrows(IllegalStateException.class,
+        () -> account.setAlias(account.getAlias(), Arrays.asList(takenAliases)));
+
+    assertEquals(exception.getMessage(), "Account alias is already set to this value.");
   }
 
   @Test

@@ -25,6 +25,14 @@ public class AccountRegistry {
     return new ArrayList<>(accounts);
   }
 
+  public ArrayList<Long> getCbus() {
+    return new ArrayList<>(accountsByCbu.keySet());
+  }
+
+  public ArrayList<String> getAliases() {
+    return new ArrayList<>(accountsByAlias.keySet());
+  }
+
   public Transaction transfer(long senderCbu, long receiverCbu, double amount) {
     Account sender = accountsByCbu.get(senderCbu);
     Account receiver = accountsByCbu.get(receiverCbu);

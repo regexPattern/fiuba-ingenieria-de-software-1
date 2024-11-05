@@ -2,6 +2,7 @@ package memo1.ejercicio1;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 
 public class Account {
@@ -44,19 +45,30 @@ public class Account {
     return cbu;
   }
 
-  // TODO: Tambien voy a necesitar una de update alias, pero que solo pueda ser
-  // utilizada de manera interna para comprobar las colisiones. Probablemente
-  // me convenga unifcar todo en una solo interfaz, para consistencia en como
-  // seteo y geteo las props.
   public String getAlias() {
     return alias;
   }
 
-  public Double getBalance() {
+  // TODO: puedo hacer esto mismo en el constructor para los CBUs, luego puedo
+  // dejar una interfaz unica a traves del registry que le autopase este
+  // parametro al account en base a los alias que tenga registrado el account
+  // registry mismo.
+  //
+  public void setAlias(String alias, List<String> takenAliases) {
+    if (alias == getAlias()) {
+      throw new IllegalStateException("Account alias is already set to this value.");
+    } else if (takenAliases.contains(alias)) {
+      throw new IllegalStateException("Alias already in use by another account.");
+    }
+
+    this.alias = alias;
+  }
+
+  public double getBalance() {
     return balance;
   }
 
-  public Transaction transfer(Account receiver, Double amount) {
+  public Transaction transfer(Account receiver, double amount) {
     if (receiver == null) {
       throw new IllegalArgumentException("Receiver account cannot be null.");
     } else if (receiver.equals(this)) {
@@ -69,7 +81,7 @@ public class Account {
     return new Transaction("transfer", amount, this, receiver);
   }
 
-  public Transaction withdraw(Double amount) {
+  public Transaction withdraw(double amount) {
     if (amount <= 0) {
       throw new IllegalArgumentException("Amount cannot be negative.");
     } else if (amount > balance) {
@@ -81,7 +93,7 @@ public class Account {
     return new Transaction("withdrawal", amount, this);
   }
 
-  public Transaction deposit(Double amount) {
+  public Transaction deposit(double amount) {
     if (amount < 0) {
       throw new IllegalArgumentException("Amount has to be positive.");
     }
@@ -125,6 +137,10 @@ public class Account {
   }
 
   public void setBranch(Branch branch) {
+    if (!branch.getOpen()) {
+      throw new IllegalStateException("Branch cannot be closed.");
+    }
+
     this.branch = branch;
   }
 
