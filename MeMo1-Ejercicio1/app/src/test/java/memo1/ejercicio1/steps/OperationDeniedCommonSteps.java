@@ -1,6 +1,7 @@
 package memo1.ejercicio1.steps;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
@@ -33,6 +34,11 @@ public class OperationDeniedCommonSteps {
   @Before
   public void reset() {
     operationResult = null;
+  }
+
+  @Then("The operation should be successful")
+  public void verifyOperationSuccessful() {
+    assertNull(operationResult);
   }
 
   @Then("The operation should be denied")

@@ -21,6 +21,20 @@ public class AccountRegistry {
     accountsByAlias.put(account.getAlias(), account);
   }
 
+  public void unRegister(long cbu) {
+    Account account = accountsByCbu.get(cbu);
+
+    if (account == null) {
+      throw new IllegalArgumentException("Account has not been registered yet.");
+    } else if (account.getBalance() > 0) {
+      throw new IllegalStateException("Cannot unregister an account that still has funds.");
+    }
+
+    accounts.remove(account);
+    accountsByCbu.remove(account.getCbu());
+    accountsByAlias.remove(account.getAlias());
+  }
+
   public ArrayList<Account> getAccounts() {
     return new ArrayList<>(accounts);
   }

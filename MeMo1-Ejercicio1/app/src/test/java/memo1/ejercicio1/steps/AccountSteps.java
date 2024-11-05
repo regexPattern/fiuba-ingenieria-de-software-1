@@ -25,8 +25,7 @@ public class AccountSteps {
   private Account account2;
   private AccountRegistry accountRegistry;
   private Branch branch;
-  private Client client1;
-  private Client client2;
+  private ArrayList<Account> prevAccounts;
 
   public AccountSteps(
       BranchCommonSteps branchSteps,
@@ -177,5 +176,37 @@ public class AccountSteps {
   @And("The account branch should remain the branch with code {long}")
   public void verifyAccountBranchCode(long code) {
     assertEquals(account1.getBranch().getCode(), code);
+  }
+
+  @Given("An account with CBU {long}, alias {string}, branch with code {long}, owner with DNI {long} and a balance of {double}")
+  public void createAccountWithBalanceWithoutSpecificBranchAndOwner(long cbu, String alias, long branchCode,
+      long ownerDni, double balance) {
+    account1 = new Account(cbu, alias, new Branch(branchCode, "someName", "someAddress"),
+        new Client(ownerDni, "someName", "someSurName"), balance);
+
+    accountRegistry.register(account1);
+  }
+
+  @When("I unregister the account with CBU {long}")
+  @When("I try to unregister the account with CBU {long}")
+  public void unRegisterAccount(long cbu) {
+    prevAccounts = accountRegistry.getAccounts();
+    operationResultSteps.execute(() -> accountRegistry.unRegister(cbu));
+  }
+
+  @And("The account with CBU {long} should be unregistered")
+  public void verifyAccountUnRegistered(long cbu) {
+    assertFalse(accountRegistry.getCbus().contains(cbu));
+  }
+
+  @And("The registered accounts should remain the same")
+  public void verifyRegisteredAccountsRemainTheSame() {
+    assertEquals(prevAccounts, accountRegistry.getAccounts());
+  }
+
+  @When("I try to unregister an account with CBU {long} that has not been registered")
+  public void unRegisterNotRegisteredAccount(long cbu) {
+    prevAccounts = accountRegistry.getAccounts();
+    operationResultSteps.execute(() -> accountRegistry.unRegister(cbu));
   }
 }
