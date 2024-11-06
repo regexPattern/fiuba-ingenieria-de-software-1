@@ -26,6 +26,10 @@ public class AccountCommonSteps {
     return account;
   }
 
+  public void setAccount(Account account) {
+    this.account = account;
+  }
+
   public ArrayList<Account> getAccounts() {
     return accountRegistry.getAccounts();
   }

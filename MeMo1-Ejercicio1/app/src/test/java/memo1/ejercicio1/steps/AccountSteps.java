@@ -16,6 +16,7 @@ import memo1.ejercicio1.Branch;
 import memo1.ejercicio1.Client;
 
 public class AccountSteps {
+  private final AccountCommonSteps accountSteps;
   private final BranchCommonSteps branchSteps;
   private final ClientCommonSteps clientSteps;
   private final OperationDeniedCommonSteps operationResultSteps;
@@ -29,9 +30,11 @@ public class AccountSteps {
   private ArrayList<Client> prevCoOwners;
 
   public AccountSteps(
+      AccountCommonSteps accountSteps,
       BranchCommonSteps branchSteps,
       ClientCommonSteps clientSteps,
       OperationDeniedCommonSteps operationResultSteps) {
+    this.accountSteps = accountSteps;
     this.branchSteps = branchSteps;
     this.clientSteps = clientSteps;
     this.operationResultSteps = operationResultSteps;
@@ -42,16 +45,16 @@ public class AccountSteps {
     accountRegistry = new AccountRegistry();
   }
 
-  @When(
-      "I create an account with CBU {long} and alias {string} in the given branch and owned by the given client")
+  @When("I create an account with CBU {long} and alias {string} in the given branch and owned by the given client")
   public void createAccountWithDefaultBalance(long cbu, String alias) {
     account1 = new Account(cbu, alias, branchSteps.getBranch(), clientSteps.getClient());
+    accountSteps.setAccount(account1);
   }
 
-  @When(
-      "I create an account with CBU {long}, alias {string} and balance of {double} in the given branch and owned by the given client")
+  @When("I create an account with CBU {long}, alias {string} and balance of {double} in the given branch and owned by the given client")
   public void createAccountWithBalance(long cbu, String alias, Double balance) {
     account1 = new Account(cbu, alias, branchSteps.getBranch(), clientSteps.getClient(), balance);
+    accountSteps.setAccount(account1);
   }
 
   @Then("The account CBU should be {long}")
@@ -70,8 +73,7 @@ public class AccountSteps {
     assertEquals(account2.getAlias(), alias);
   }
 
-  @And(
-      "The account branch should be the branch with code {long}, name {string} and address {string}")
+  @And("The account branch should be the branch with code {long}, name {string} and address {string}")
   public void verifyAccountBranch(long code, String name, String address) {
     Branch branch = account1.getBranch();
 
@@ -89,36 +91,29 @@ public class AccountSteps {
     assertEquals(owner.getSurName(), surName);
   }
 
-  @Given(
-      "An account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
-  @Given(
-      "I register an account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
+  @Given("An account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
+  @Given("I register an account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
   public void createFirstAccountWithoutSpecificBranchAndOwner(
       long cbu, String alias, long branchCode, long ownerDni) {
-    account1 =
-        new Account(
-            cbu,
-            alias,
-            new Branch(branchCode, "Some branch", "Some address"),
-            new Client(ownerDni, "Some name", "Some surname"));
+    account1 = new Account(
+        cbu,
+        alias,
+        new Branch(branchCode, "Some branch", "Some address"),
+        new Client(ownerDni, "Some name", "Some surname"));
 
     operationResultSteps.execute(() -> accountRegistry.register(account1));
   }
 
-  @When(
-      "I try to register an account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
-  @When(
-      "I register another account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
-  @And(
-      "Another account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
+  @When("I try to register an account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
+  @When("I register another account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
+  @And("Another account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
   public void createAndRegisterSecondAccountWithoutSpecificBranchAndOwner(
       long cbu, String alias, long branchCode, long ownerDni) {
-    account2 =
-        new Account(
-            cbu,
-            alias,
-            new Branch(branchCode, "Some branch", "Some address"),
-            new Client(ownerDni, "Some name", "Some surname"));
+    account2 = new Account(
+        cbu,
+        alias,
+        new Branch(branchCode, "Some branch", "Some address"),
+        new Client(ownerDni, "Some name", "Some surname"));
 
     operationResultSteps.execute(() -> accountRegistry.register(account2));
   }
@@ -147,8 +142,7 @@ public class AccountSteps {
     branch.setOpen(false);
   }
 
-  @When(
-      "I try to create an account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
+  @When("I try to create an account with CBU {long}, alias {string}, branch with code {long} and owner with DNI {long}")
   public void registerAccountWithClosedBranch(
       long cbu, String alias, Long branchCode, Long ownerDni) {
     operationResultSteps.execute(
@@ -185,17 +179,15 @@ public class AccountSteps {
     assertEquals(account1.getBranch().getCode(), code);
   }
 
-  @Given(
-      "An account with CBU {long}, alias {string}, branch with code {long}, owner with DNI {long} and a balance of {double}")
+  @Given("An account with CBU {long}, alias {string}, branch with code {long}, owner with DNI {long} and a balance of {double}")
   public void createAccountWithBalanceWithoutSpecificBranchAndOwner(
       long cbu, String alias, long branchCode, long ownerDni, double balance) {
-    account1 =
-        new Account(
-            cbu,
-            alias,
-            new Branch(branchCode, "someName", "someAddress"),
-            new Client(ownerDni, "someName", "someSurName"),
-            balance);
+    account1 = new Account(
+        cbu,
+        alias,
+        new Branch(branchCode, "someName", "someAddress"),
+        new Client(ownerDni, "someName", "someSurName"),
+        balance);
 
     accountRegistry.register(account1);
   }
@@ -223,8 +215,7 @@ public class AccountSteps {
     operationResultSteps.execute(() -> accountRegistry.unRegister(cbu));
   }
 
-  @When(
-      "I add client with DNI {long}, name {string} and surname {string} as one of the account co-owners")
+  @When("I add client with DNI {long}, name {string} and surname {string} as one of the account co-owners")
   public void createClientAsAccountCoOwner(long dni, String name, String surName) {
     coOwner = new Client(dni, name, surName);
     account1.setCoOwner(coOwner);
@@ -251,8 +242,7 @@ public class AccountSteps {
     assertEquals(account1.getCoOwners(), prevCoOwners);
   }
 
-  @And(
-      "A client with DNI {long}, name {string} and surname {string} who is one of the account co-owners")
+  @And("A client with DNI {long}, name {string} and surname {string} who is one of the account co-owners")
   public void createClientAsCoOwner(long dni, String name, String surName) {
     coOwner = new Client(dni, name, surName);
     account1.setCoOwner(coOwner);
