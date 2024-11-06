@@ -1,26 +1,47 @@
 package memo1.ejercicio1.steps;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import memo1.ejercicio1.Account;
 import memo1.ejercicio1.AccountRegistry;
+import memo1.ejercicio1.Branch;
+import memo1.ejercicio1.Client;
 
 public class AccountCommonSteps {
+  private Account account;
   private AccountRegistry accountRegistry;
+
+  @Before
+  public void reset() {
+    account = null;
+    accountRegistry = new AccountRegistry();
+  }
+
+  public Account getAccount() {
+    return account;
+  }
 
   public ArrayList<Account> getAccounts() {
     return accountRegistry.getAccounts();
   }
 
-  @Before
-  public void reset() {
-    accountRegistry = new AccountRegistry();
+  @Given("An account with CBU {long}, alias {string} and a balance of {double}")
+  public void createAccountWithCbuAliasAndBalance(long cbu, String alias, double balance) {
+    account = new Account(
+        cbu,
+        alias,
+        new Branch(1L, "someName", "someAddress"),
+        new Client(123456789L, "someName", "someSurName"),
+        balance);
   }
 
-  // @Given("An account with CBU {long}, alias {string}, branch with code {long} and owner with DNI
-  // {long}")
-  // public void createBranch(long cbu, String alias, Long branchCode, Long ownerDni) {
-  //  accountRegistry.register(new Account(cbu, alias, new Branch(branchCode, "", ""), new
-  // Client(ownerDni, "", "")));
-  // }
+  @And("The account balance should be {double}")
+  public void verifyAccountBalance(Double balance) {
+    assertEquals(account.getBalance(), balance, 0.01);
+  }
 }

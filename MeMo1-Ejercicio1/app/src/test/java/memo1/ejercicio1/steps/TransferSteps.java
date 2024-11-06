@@ -8,13 +8,15 @@ import io.cucumber.java.en.*;
 import memo1.ejercicio1.*;
 
 public class TransferSteps {
+  private final AccountCommonSteps accountSteps;
   private final OperationDeniedCommonSteps operationResultSteps;
 
   private Account sender;
   private Account receiver;
   private Transaction transaction;
 
-  public TransferSteps(OperationDeniedCommonSteps operationResultSteps) {
+  public TransferSteps(AccountCommonSteps accountSteps, OperationDeniedCommonSteps operationResultSteps) {
+    this.accountSteps = accountSteps;
     this.operationResultSteps = operationResultSteps;
   }
 
@@ -95,6 +97,7 @@ public class TransferSteps {
   }
 
   @And("The transaction sender should be account with CBU {long}")
+  @And("The transaction account should be account with CBU {long}")
   public void verifyTransactionSender(long cbu) {
     assertEquals(transaction.getSender().getCbu(), cbu);
   }
@@ -102,6 +105,12 @@ public class TransferSteps {
   @And("The transaction receiver should be account with CBU {long}")
   public void verifyTransactionReceiver(long cbu) {
     assertEquals(transaction.getReceiver().getCbu(), cbu);
+  }
+
+  @When("I deposit {double} into the account")
+  @When("I try to deposit {double} into the account")
+  public void depositIntoAccount(double amount) {
+    transaction = operationResultSteps.execute(() -> accountSteps.getAccount().deposit(amount));
   }
 
   private Branch dummyBranch() {

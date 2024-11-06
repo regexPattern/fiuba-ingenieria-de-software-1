@@ -70,11 +70,6 @@ public class AccountSteps {
     assertEquals(account2.getAlias(), alias);
   }
 
-  @And("The account balance should be {double}")
-  public void verifyAccountBalance(Double balance) {
-    assertEquals(account1.getBalance(), balance, 0.01);
-  }
-
   @And(
       "The account branch should be the branch with code {long}, name {string} and address {string}")
   public void verifyAccountBranch(long code, String name, String address) {

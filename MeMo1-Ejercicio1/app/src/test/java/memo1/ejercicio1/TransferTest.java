@@ -1,5 +1,6 @@
 package memo1.ejercicio1;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -90,7 +91,7 @@ class TransferTest {
     assertEquals(transaction.getAmount(), 10.0);
 
     assertEquals(transaction.getSender(), account);
-    assertEquals(transaction.getReceiver(), account);
+    assertNull(transaction.getReceiver());
   }
 
   @Test
@@ -103,7 +104,7 @@ class TransferTest {
     assertEquals(transaction.getAmount(), 10.0);
 
     assertEquals(transaction.getSender(), account);
-    assertEquals(transaction.getReceiver(), account);
+    assertNull(transaction.getReceiver());
   }
 
   @Test
