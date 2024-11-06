@@ -49,8 +49,12 @@ class BranchRegistryTest {
 
     branchRegistry.register(branch);
 
-    Exception exception = assertThrows(IllegalStateException.class,
-        () -> branchRegistry.register(new Branch(branch.getCode(), "Suc. Recoleta", "Santa Fe 1000 CABA")));
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () ->
+                branchRegistry.register(
+                    new Branch(branch.getCode(), "Suc. Recoleta", "Santa Fe 1000 CABA")));
 
     assertEquals(exception.getMessage(), "Code already in use by another branch.");
   }
@@ -82,7 +86,8 @@ class BranchRegistryTest {
   void closingBranchThatIsNotYetRegisteredThrowsException() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
-    Exception exception = assertThrows(IllegalStateException.class, () -> branchRegistry.close(17512312L));
+    Exception exception =
+        assertThrows(IllegalStateException.class, () -> branchRegistry.close(17512312L));
 
     assertEquals(exception.getMessage(), "Branch with given code has not been registered.");
   }
@@ -129,8 +134,9 @@ class BranchRegistryTest {
   void updatingNonRegisteredBranchThrowsException() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
-    Exception exception = assertThrows(
-        IllegalStateException.class, () -> branchRegistry.updateBranchName(900L, "New Name"));
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class, () -> branchRegistry.updateBranchName(900L, "New Name"));
 
     assertEquals(exception.getMessage(), "Branch with given code has not been registered.");
   }

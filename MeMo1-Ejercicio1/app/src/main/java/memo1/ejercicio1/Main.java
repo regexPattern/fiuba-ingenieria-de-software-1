@@ -47,8 +47,8 @@ public class Main {
     logAccountOwners(account2);
     logAccountOwners(account3);
 
-    Transaction transferByAliasTransaction = accountRegister.transfer(
-        account3.getAlias(), account1.getAlias(), 120.0);
+    Transaction transferByAliasTransaction =
+        accountRegister.transfer(account3.getAlias(), account1.getAlias(), 120.0);
 
     logTransaction(transferByAliasTransaction);
   }
