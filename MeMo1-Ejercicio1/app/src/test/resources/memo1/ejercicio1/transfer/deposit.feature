@@ -4,7 +4,7 @@ Feature: Depositing funds
     Given An account with CBU 123456789, alias "account" and a balance of 1000.0
     When I deposit 200.0 into the account
     Then The account balance should be 1200.0
-    And The transfer should generate a transaction
+    And The deposit should generate a transaction
     And The transaction should have a correlative code
     And The transaction should have a date
     And The transaction should have a time

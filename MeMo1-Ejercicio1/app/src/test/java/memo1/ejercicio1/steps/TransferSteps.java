@@ -51,6 +51,8 @@ public class TransferSteps {
   }
 
   @Then("The transfer should generate a transaction")
+  @Then("The deposit should generate a transaction")
+  @Then("The withdrawal should generate a transaction")
   public void verifyTransactionGenerated() {
     assertNotNull(transaction);
   }
@@ -111,6 +113,12 @@ public class TransferSteps {
   @When("I try to deposit {double} into the account")
   public void depositIntoAccount(double amount) {
     transaction = operationResultSteps.execute(() -> accountSteps.getAccount().deposit(amount));
+  }
+
+  @When("I withdraw {double} from the account")
+  @When("I try to withdraw {double} from the account")
+  public void withdrawFromAccount(double amount) {
+    transaction = operationResultSteps.execute(() -> accountSteps.getAccount().withdraw(amount));
   }
 
   private Branch dummyBranch() {
