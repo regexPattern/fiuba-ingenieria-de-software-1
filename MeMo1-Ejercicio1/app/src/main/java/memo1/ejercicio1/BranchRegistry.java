@@ -5,41 +5,54 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class BranchRegistry {
-  private HashMap<Long, Branch> branchesByCode = new HashMap<>();
+  private HashMap<Long, Branch> branches = new HashMap<>();
   private HashSet<String> usedBranchNames = new HashSet<>();
   private HashSet<String> useBranchAddresses = new HashSet<>();
 
   public void register(Branch branch) {
-    if (branchesByCode.putIfAbsent(branch.getCode(), branch) != null) {
+    if (branches.containsKey(branch.getCode())) {
       throw new IllegalStateException("Code already in use by another branch.");
     } else if (usedBranchNames.contains(branch.getName())) {
       throw new IllegalStateException("Name already in use by another branch.");
     }
 
     branch.setOpen(true);
+
+    branches.put(branch.getCode(), branch);
     usedBranchNames.add(branch.getName());
   }
 
   public ArrayList<Branch> getBranchCodes() {
-    return new ArrayList<>(branchesByCode.values());
+    return new ArrayList<>(branches.values());
   }
 
-  public boolean reOpen(long code) {
+  public void reOpen(long code) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
-      return false;
+      throw new IllegalArgumentException("Branch with given code has not been registered.");
     }
 
     branch.setOpen(true);
-    return true;
   }
 
-  public Boolean close(long code) {
+  public boolean close(long code, AccountRegistry accountRegistry) {
     Branch branch = getBranch(code);
 
     if (branch == null) {
       throw new IllegalStateException("Branch with given code has not been registered.");
+    }
+
+    boolean branchHasAccounts = false;
+    for (Account acc : accountRegistry.getAccounts()) {
+      if (acc.getBranch().equals(branch)) {
+        branchHasAccounts = true;
+        break;
+      }
+    }
+
+    if (branchHasAccounts) {
+      throw new IllegalStateException("Branch has still account associated with it.");
     }
 
     if (!branch.getOpen()) {
@@ -84,6 +97,6 @@ public class BranchRegistry {
   }
 
   public Branch getBranch(long code) {
-    return branchesByCode.get(code);
+    return branches.get(code);
   }
 }

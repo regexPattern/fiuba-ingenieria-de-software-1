@@ -2,20 +2,20 @@ package memo1.ejercicio1.steps;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
-
 import io.cucumber.java.en.*;
 import memo1.ejercicio1.*;
+import org.junit.Before;
 
 public class TransferSteps {
   private final AccountCommonSteps accountSteps;
-  private final OperationDeniedCommonSteps operationResultSteps;
+  private final OperationResultCommonSteps operationResultSteps;
 
   private Account sender;
   private Account receiver;
   private Transaction transaction;
 
-  public TransferSteps(AccountCommonSteps accountSteps, OperationDeniedCommonSteps operationResultSteps) {
+  public TransferSteps(
+      AccountCommonSteps accountSteps, OperationResultCommonSteps operationResultSteps) {
     this.accountSteps = accountSteps;
     this.operationResultSteps = operationResultSteps;
   }

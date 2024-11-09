@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 
 class BranchTest {
   @Test
-  void aBranchIsClosedWhenCreated() {
+  void constructorOpensTheBranch() {
     Branch branch = new Branch(1L, "Suc. Recoleta", "Santa Fe 2000 CABA");
 
-    assertFalse(branch.getOpen());
+    assertTrue(branch.getOpen());
   }
 }

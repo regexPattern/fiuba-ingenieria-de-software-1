@@ -12,7 +12,7 @@ Feature: Branch update
     Given A branch with code 984, name "Suc. Belgrano" and address "Cabildo 3456 CABA"
     And Another branch with code 100, name "Suc. Recoleta" and address "Santa Fe 2000 CABA"
     When I update the branch with code 984 address to "Santa Fe 2000 CABA"
-    Then The branch update operation should not fail
+    Then The operation should be successful
     And The branch with code 984 address should remain "Santa Fe 2000 CABA"
     And The branch with code 100 address should remain "Santa Fe 2000 CABA"
 
@@ -20,6 +20,6 @@ Feature: Branch update
     Given A branch with code 984, name "Suc. Belgrano" and address "Cabildo 3456 CABA"
     And Another branch with code 100, name "Suc. Recoleta" and address "Santa Fe 2000 CABA"
     When I update the branch with code 984 name to "Suc. Recoleta"
-    Then The branch update operation should fail
+    Then The operation should be denied
     And The branch with code 984 name should remain "Suc. Belgrano"
     And The branch with code 100 name should remain "Suc. Recoleta"

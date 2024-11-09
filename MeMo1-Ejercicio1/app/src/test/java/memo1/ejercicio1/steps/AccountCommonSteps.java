@@ -1,11 +1,10 @@
 package memo1.ejercicio1.steps;
 
+import static org.junit.Assert.assertEquals;
+
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
-
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import memo1.ejercicio1.Account;
 import memo1.ejercicio1.AccountRegistry;
@@ -26,6 +25,10 @@ public class AccountCommonSteps {
     return account;
   }
 
+  public AccountRegistry getAccountRegistry() {
+    return accountRegistry;
+  }
+
   public void setAccount(Account account) {
     this.account = account;
   }
@@ -36,12 +39,15 @@ public class AccountCommonSteps {
 
   @Given("An account with CBU {long}, alias {string} and a balance of {double}")
   public void createAccountWithCbuAliasAndBalance(long cbu, String alias, double balance) {
-    account = new Account(
-        cbu,
-        alias,
-        new Branch(1L, "someName", "someAddress"),
-        new Client(123456789L, "someName", "someSurName"),
-        balance);
+    account =
+        new Account(
+            cbu,
+            alias,
+            new Branch(1L, "someName", "someAddress"),
+            new Client(123456789L, "someName", "someSurName"),
+            balance);
+
+    accountRegistry.register(account);
   }
 
   @And("The account balance should be {double}")

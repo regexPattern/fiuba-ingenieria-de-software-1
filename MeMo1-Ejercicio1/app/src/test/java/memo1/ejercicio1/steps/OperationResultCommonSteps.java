@@ -7,7 +7,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.en.Then;
 import java.util.function.Supplier;
 
-public class OperationDeniedCommonSteps {
+public class OperationResultCommonSteps {
   private Exception operationResult;
 
   public Exception getOperationResult() {

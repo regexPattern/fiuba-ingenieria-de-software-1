@@ -1,5 +1,7 @@
 package memo1.ejercicio1;
 
+import java.util.Objects;
+
 public class Branch {
   private long code;
   private String name;
@@ -39,5 +41,18 @@ public class Branch {
 
   public void setOpen(boolean open) {
     this.open = open;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    } else if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    Branch otherBranch = (Branch) obj;
+
+    return Objects.equals(getCode(), otherBranch.getCode());
   }
 }

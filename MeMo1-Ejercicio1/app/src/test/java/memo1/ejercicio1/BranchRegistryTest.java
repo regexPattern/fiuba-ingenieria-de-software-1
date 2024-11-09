@@ -31,7 +31,7 @@ class BranchRegistryTest {
   }
 
   @Test
-  void registeringBranchSetsItAsOpened() {
+  void registeringBranchSetsLeavesItOpened() {
     BranchRegistry branchRegistry = new BranchRegistry();
 
     Branch branch = new Branch(17512312L, "Suc. Belgrano", "Cabildo 1000 CABA");
@@ -67,7 +67,7 @@ class BranchRegistryTest {
 
     branchRegistry.register(branch);
 
-    assertTrue(branchRegistry.close(branch.getCode()));
+    assertTrue(branchRegistry.close(branch.getCode(), new AccountRegistry()));
   }
 
   @Test
@@ -77,9 +77,9 @@ class BranchRegistryTest {
     Branch branch = new Branch(17512312L, "Suc. Belgrano", "Cabildo 1000 CABA");
 
     branchRegistry.register(branch);
-    branchRegistry.close(branch.getCode());
+    branchRegistry.close(branch.getCode(), new AccountRegistry());
 
-    assertFalse(branchRegistry.close(branch.getCode()));
+    assertFalse(branchRegistry.close(branch.getCode(), new AccountRegistry()));
   }
 
   @Test
@@ -87,19 +87,21 @@ class BranchRegistryTest {
     BranchRegistry branchRegistry = new BranchRegistry();
 
     Exception exception =
-        assertThrows(IllegalStateException.class, () -> branchRegistry.close(17512312L));
+        assertThrows(
+            IllegalStateException.class,
+            () -> branchRegistry.close(17512312L, new AccountRegistry()));
 
     assertEquals(exception.getMessage(), "Branch with given code has not been registered.");
   }
 
   @Test
-  void accountCanBeReOpenedAfterBeingClosed() {
+  void branchCanBeReOpenedAfterBeingClosed() {
     BranchRegistry branchRegistry = new BranchRegistry();
     Branch branch = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
 
     branchRegistry.register(branch);
 
-    branchRegistry.close(branch.getCode());
+    branchRegistry.close(branch.getCode(), new AccountRegistry());
     branchRegistry.reOpen(branch.getCode());
 
     assertTrue(branch.getOpen());
@@ -112,10 +114,30 @@ class BranchRegistryTest {
 
     branchRegistry.register(branch);
 
-    branchRegistry.close(branch.getCode());
-    branchRegistry.close(branch.getCode());
+    branchRegistry.close(branch.getCode(), new AccountRegistry());
+    branchRegistry.close(branch.getCode(), new AccountRegistry());
 
     assertFalse(branch.getOpen());
+  }
+
+  @Test
+  void closingBranchWithAccountsThrowsException() {
+    BranchRegistry branchRegistry = new BranchRegistry();
+    AccountRegistry accountRegistry = new AccountRegistry();
+
+    Branch branch = new Branch(1L, "Suc. Belgrano", "Cabildo 1000 CABA");
+    Account account =
+        new Account(123123L, "account", branch, new Client(1231L, "Carlos", "Castillo"));
+
+    branchRegistry.register(branch);
+    accountRegistry.register(account);
+
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () -> branchRegistry.close(branch.getCode(), accountRegistry));
+
+    assertEquals(exception.getMessage(), "Branch has still account associated with it.");
   }
 
   @Test
