@@ -8,6 +8,7 @@ import java.time.format.DateTimeParseException;
 import org.junit.jupiter.api.Test;
 
 class ClientTest {
+
   @Test
   void constructorShouldSetBirthDateCorrectly() {
     String birthDateString = "10/09/2001";
@@ -73,5 +74,63 @@ class ClientTest {
     LocalDate marriageDate = client1.setPartner(client2, marriageDateString);
 
     assertEquals(marriageDate, expectedMarriageDate);
+  }
+
+  @Test
+  public void updatingClient() {
+    Client client = new Client(123456789, "Carlos", "Castillo", "10/09/2001", "Paseo Colón 950");
+
+    client.update("Carlos Alberto", "Castillo Ruiz", "10/09/1980", "Av. Las Heras 2214");
+
+    assertEquals(client.getName(), "Carlos Alberto");
+    assertEquals(client.getSurName(), "Castillo Ruiz");
+    assertEquals(client.getBirthDate().format(Client.dateFormatter), "10/09/1980");
+    assertEquals(client.getAddress(), "Av. Las Heras 2214");
+    assertEquals(client.getDni(), 123456789);
+  }
+
+  @Test
+  public void updatingClientPartially() {
+    Client client = new Client(123456789, "Carlos", "Castillo", "10/09/2001", "Paseo Colón 950");
+
+    client.update("Carlos Alberto", null, null, null);
+    assertEquals(client.getName(), "Carlos Alberto");
+
+    client.update(null, "Castillo Ruiz", null, null);
+    assertEquals(client.getName(), "Carlos Alberto");
+
+    client.update(null, null, "11/09/2001", null);
+    assertEquals(client.getBirthDate().format(Client.dateFormatter), "11/09/2001");
+
+    client.update(null, null, null, "Av. Las Heras 2214");
+    assertEquals(client.getAddress(), "Av. Las Heras 2214");
+  }
+
+  @Test
+  public void updatingClientWithFutureBirthDateThrowsException() {
+    Client client = new Client(123456789, "Carlos", "Castillo", "10/09/2001", "Paseo Colón 950");
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> {
+              LocalDate futureDate = LocalDate.now().plusYears(2);
+              client.update(null, null, futureDate.format(Client.dateFormatter), null);
+            });
+
+    assertEquals(exception.getMessage(), "Birth date cannot be a future date.");
+    assertEquals("10/09/2001", client.getBirthDate().format(Client.dateFormatter));
+  }
+
+  @Test
+  public void updatingClientWithEmptyValuesLeavesItUnchanged() {
+    Client client = new Client(123456789, "Carlos", "Castillo", "10/09/2001", "Paseo Colón 950");
+
+    client.update("", "", "", "");
+
+    assertEquals(client.getName(), "Carlos");
+    assertEquals(client.getSurName(), "Castillo");
+    assertEquals(client.getBirthDate().format(Client.dateFormatter), "10/09/2001");
+    assertEquals(client.getAddress(), "Paseo Colón 950");
   }
 }

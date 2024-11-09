@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Client {
+
   private long dni;
   private String name;
   private String surName;
@@ -62,5 +63,27 @@ public class Client {
 
   public Client getPartner() {
     return partner;
+  }
+
+  public void update(String name, String surName, String birthDateString, String address) {
+    if (name != null && !name.isEmpty()) {
+      this.name = name;
+    }
+
+    if (surName != null && !surName.isEmpty()) {
+      this.surName = surName;
+    }
+
+    if (birthDateString != null && !birthDateString.isEmpty()) {
+      LocalDate newBirthDate = LocalDate.parse(birthDateString, dateFormatter);
+      if (newBirthDate.isAfter(LocalDate.now())) {
+        throw new IllegalArgumentException("Birth date cannot be a future date.");
+      }
+      this.birthDate = newBirthDate;
+    }
+
+    if (address != null && !address.isEmpty()) {
+      this.address = address;
+    }
   }
 }

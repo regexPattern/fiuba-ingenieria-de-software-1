@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class AccountRegistry {
+
   private HashSet<Account> accounts = new HashSet<>();
   private HashMap<Long, Account> accountsByCbu = new HashMap<>();
   private HashMap<String, Account> accountsByAlias = new HashMap<>();
@@ -70,6 +71,4 @@ public class AccountRegistry {
 
     return sender.transfer(receiver, amount);
   }
-
-  // TODO: Acá también tengo que manejar todo lo de account deletion.
 }
