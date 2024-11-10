@@ -17,7 +17,8 @@ public class ClientRegistry {
     return new ArrayList<>(registeredClients.values());
   }
 
-  public Client unregister(long dni, AccountRegistry accountRegistry) {
+  public Client unregister(
+      long dni, AccountRegistry accountRegistry, MarriageRegistry marriageRegistry) {
     Client client = registeredClients.get(dni);
 
     if (client == null) {
@@ -33,6 +34,12 @@ public class ClientRegistry {
         if (coOwner.getDni() == dni) {
           throw new IllegalStateException("Cannot delete a client who co-owns an account.");
         }
+      }
+    }
+
+    for (MarriageRelationship marriage : marriageRegistry.getMarriages()) {
+      if (marriage.getClientDnis().contains(dni)) {
+        throw new IllegalStateException("Cannot delete a client who is currently married.");
       }
     }
 

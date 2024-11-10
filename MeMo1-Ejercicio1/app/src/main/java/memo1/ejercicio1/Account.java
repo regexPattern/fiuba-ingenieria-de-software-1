@@ -49,11 +49,6 @@ public class Account {
     return alias;
   }
 
-  // TODO: puedo hacer esto mismo en el constructor para los CBUs, luego puedo
-  // dejar una interfaz unica a traves del registry que le autopase este
-  // parametro al account en base a los alias que tenga registrado el account
-  // registry mismo.
-  //
   public void setAlias(String alias, List<String> takenAliases) {
     if (alias == getAlias()) {
       throw new IllegalStateException("Account alias is already set to this value.");
@@ -107,15 +102,31 @@ public class Account {
     return owner;
   }
 
-  void setOwner(Client client) {
+  public void setOwner(Client client) {
     if (client == null) {
       throw new IllegalArgumentException("New owner cannot be null.");
+    } else if (client.equals(getOwner())) {
+      throw new IllegalStateException("New owner cannot be the same as current owner.");
     }
 
     Client oldOwner = getOwner();
     owner = client;
 
     setCoOwner(oldOwner);
+
+    if (coOwners.contains(client)) {
+      coOwners.remove(client);
+    }
+  }
+
+  public void removeCoOwner(Client client) {
+    if (client == null) {
+      throw new IllegalArgumentException("Co-owner to remove cannot be null.");
+    } else if (!coOwners.contains(client)) {
+      throw new IllegalStateException("Client is not a co-owner of this account.");
+    }
+
+    coOwners.remove(client);
   }
 
   public ArrayList<Client> getCoOwners() {

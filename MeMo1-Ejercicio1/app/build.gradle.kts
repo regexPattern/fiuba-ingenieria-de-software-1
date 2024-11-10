@@ -42,7 +42,7 @@ tasks.named<Test>("test") {
 
     testLogging {
         events("failed")
-        showStandardStreams = false
+        showStandardStreams = true
     }
 }
 

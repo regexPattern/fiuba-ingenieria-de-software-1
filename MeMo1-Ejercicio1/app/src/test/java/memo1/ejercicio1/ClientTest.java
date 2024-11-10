@@ -53,30 +53,6 @@ class ClientTest {
   }
 
   @Test
-  void settingAClientAsMarriedToAnotherSetsBothClientsPartners() {
-    Client client1 = new Client(123456789L, "Carlos", "Castillo");
-    Client client2 = new Client(987654121L, "Lea", "Seydoux");
-
-    client1.setPartner(client2, "12/12/1999");
-
-    assertEquals(client1.getPartner(), client2);
-    assertEquals(client2.getPartner(), client1);
-  }
-
-  @Test
-  void settingAClientsPartnerReturnsTheMarriageDate() {
-    Client client1 = new Client(123456789L, "Carlos", "Castillo");
-    Client client2 = new Client(987654121L, "Lea", "Seydoux");
-
-    String marriageDateString = "12/12/1999";
-
-    LocalDate expectedMarriageDate = LocalDate.parse(marriageDateString, Client.dateFormatter);
-    LocalDate marriageDate = client1.setPartner(client2, marriageDateString);
-
-    assertEquals(marriageDate, expectedMarriageDate);
-  }
-
-  @Test
   public void updatingClient() {
     Client client = new Client(123456789, "Carlos", "Castillo", "10/09/2001", "Paseo Colón 950");
 

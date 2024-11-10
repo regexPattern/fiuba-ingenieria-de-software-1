@@ -1,5 +1,6 @@
 .gradle
 .settings
+.zed
 /**/.project
 /**/build
 app/.classpath

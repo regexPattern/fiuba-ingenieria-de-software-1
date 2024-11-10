@@ -10,7 +10,6 @@ public class Client {
   private String surName;
   private LocalDate birthDate;
   private String address;
-  private Client partner;
 
   public static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -52,19 +51,6 @@ public class Client {
     return address;
   }
 
-  public LocalDate setPartner(Client client, String marriageDateString) {
-    LocalDate marriageDate = LocalDate.parse(marriageDateString, dateFormatter);
-
-    partner = client;
-    client.partner = this;
-
-    return marriageDate;
-  }
-
-  public Client getPartner() {
-    return partner;
-  }
-
   public void update(String name, String surName, String birthDateString, String address) {
     if (name != null && !name.isEmpty()) {
       this.name = name;
@@ -85,5 +71,17 @@ public class Client {
     if (address != null && !address.isEmpty()) {
       this.address = address;
     }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Client other = (Client) obj;
+    return dni == other.dni;
   }
 }

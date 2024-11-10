@@ -1,5 +1,6 @@
 package memo1.ejercicio1;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -281,6 +282,111 @@ class AccountTest {
         new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch2, owner1));
     assertNotEquals(
         new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch1, owner2));
+  }
+
+  @Test
+  void settingCurrentOwnerAsNewOwnerThrowsException() {
+    Account account = dummyAccount();
+    Client currentOwner = account.getOwner();
+
+    Exception exception =
+        assertThrows(IllegalStateException.class, () -> account.setOwner(currentOwner));
+
+    assertEquals(exception.getMessage(), "New owner cannot be the same as current owner.");
+  }
+
+  @Test
+  void settingNewOwnerReplacesExistingCoOwner() {
+    Client originalOwner = new Client(98765421L, "Carlos", "Castillo");
+    Client firstNewOwner = new Client(11231232L, "Eduardo", "Pereira");
+    Client secondNewOwner = new Client(33445566L, "Ana", "García");
+
+    Account account =
+        new Account(
+            123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), originalOwner);
+
+    account.setOwner(firstNewOwner);
+
+    assertEquals(account.getOwner(), firstNewOwner);
+    assertTrue(account.getCoOwners().contains(originalOwner));
+
+    account.setOwner(secondNewOwner);
+
+    assertEquals(account.getOwner(), secondNewOwner);
+    assertTrue(account.getCoOwners().contains(firstNewOwner));
+    assertTrue(account.getCoOwners().contains(originalOwner));
+  }
+
+  @Test
+  void settingCoOwnerAsNewOwnerRemovesThemFromCoOwners() {
+    Client originalOwner = new Client(98765421L, "Carlos", "Castillo");
+    Client coOwner = new Client(11231232L, "Eduardo", "Pereira");
+
+    Account account =
+        new Account(
+            123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), originalOwner);
+
+    account.setCoOwner(coOwner);
+    assertTrue(account.getCoOwners().contains(coOwner));
+
+    account.setOwner(coOwner);
+
+    assertEquals(account.getOwner(), coOwner);
+    assertFalse(account.getCoOwners().contains(coOwner));
+    assertTrue(account.getCoOwners().contains(originalOwner));
+    assertEquals(account.getCoOwners().size(), 1);
+  }
+
+  @Test
+  void removeCoOwnerRemovesExistingCoOwner() {
+    Account account = dummyAccount();
+    Client coOwner = new Client(98765421L, "Wendollin", "Hernández");
+
+    account.setCoOwner(coOwner);
+    assertTrue(account.getCoOwners().contains(coOwner));
+
+    account.removeCoOwner(coOwner);
+
+    assertFalse(account.getCoOwners().contains(coOwner));
+    assertEquals(account.getCoOwners().size(), 0);
+  }
+
+  @Test
+  void removeCoOwnerThrowsExceptionWhenCoOwnerIsNull() {
+    Account account = dummyAccount();
+
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> account.removeCoOwner(null));
+
+    assertEquals(exception.getMessage(), "Co-owner to remove cannot be null.");
+  }
+
+  @Test
+  void removeCoOwnerThrowsExceptionWhenClientIsNotCoOwner() {
+    Account account = dummyAccount();
+    Client nonCoOwner = new Client(98765421L, "Wendollin", "Hernández");
+
+    Exception exception =
+        assertThrows(IllegalStateException.class, () -> account.removeCoOwner(nonCoOwner));
+
+    assertEquals(exception.getMessage(), "Client is not a co-owner of this account.");
+  }
+
+  @Test
+  void removeCoOwnerOnlyRemovesSpecificCoOwner() {
+    Account account = dummyAccount();
+    Client coOwner1 = new Client(98765421L, "Wendollin", "Hernández");
+    Client coOwner2 = new Client(11231232L, "Eduardo", "Pereira");
+
+    account.setCoOwner(coOwner1);
+    account.setCoOwner(coOwner2);
+    assertEquals(account.getCoOwners().size(), 2);
+
+    account.removeCoOwner(coOwner1);
+
+    assertFalse(account.getCoOwners().contains(coOwner1));
+    assertTrue(account.getCoOwners().contains(coOwner2));
+    assertEquals(account.getCoOwners().size(), 1);
   }
 
   private Account dummyAccount() {
