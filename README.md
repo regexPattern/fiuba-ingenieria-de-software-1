@@ -5,5 +5,3 @@ Incluye pruebas unitarias, escenarios en Gherkin y pruebas funcionales basadas e
 
 Padrón: 108535
 Nombre: Carlos Eduardo Castillo
-
-Test para verificar que no se puede cambiar el titular de una cuenta
