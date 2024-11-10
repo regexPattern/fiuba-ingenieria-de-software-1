@@ -237,7 +237,7 @@ public class AccountSteps {
 
   @Then("The client with DNI {long} should be one of the account co-owners")
   public void verifyAccountCoOwner(long dni) {
-    assertEquals(account1.getCoOwners().getFirst().getDni(), dni);
+    assertEquals(account1.getCoOwners().get(0).getDni(), dni);
   }
 
   @And("The client with DNI {long} should still be the account owner")
@@ -272,7 +272,7 @@ public class AccountSteps {
 
   @When("I set the client with DNI {long} as the new account owner")
   public void setCoOwnerAsNewOwner(long dni) {
-    account1.setOwner(account1.getCoOwners().getFirst());
+    account1.setOwner(account1.getCoOwners().get(0));
   }
 
   @And("The account should have only one co-owner")
@@ -282,7 +282,7 @@ public class AccountSteps {
 
   @When("I remove the client with DNI {long} from the account co-owners")
   public void removeAccountCoOwner(long dni) {
-    operationResultSteps.execute(() -> account1.removeCoOwner(account1.getCoOwners().getFirst()));
+    operationResultSteps.execute(() -> account1.removeCoOwner(account1.getCoOwners().get(0)));
   }
 
   @Then("The client with DNI {long} should not be one of the account co-owners")
