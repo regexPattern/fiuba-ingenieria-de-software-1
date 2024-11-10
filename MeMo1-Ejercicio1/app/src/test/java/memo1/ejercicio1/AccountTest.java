@@ -1,245 +1,399 @@
 package memo1.ejercicio1;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashSet;
-
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 class AccountTest {
-    @Test
-    void constructorShouldSetCbuAndAliasCorrectly() {
-        Long cbu = 123456789L;
-        String alias = "account";
+  @Test
+  void constructorSetsCbuAliasBranchAndOwnersCorrectly() {
+    long cbu = 123456789L;
+    String alias = "account";
+    Branch branch = new Branch(1L, "Branch 1", "Paseo Colón 950");
+    Client owner = new Client(96113425L, "Carlos", "Castillo");
+
+    Account account = new Account(cbu, alias, branch, owner);
+
+    assertEquals(account.getCbu(), cbu);
+    assertEquals(account.getAlias(), alias);
+    assertEquals(account.getBranch(), branch);
+    assertEquals(account.getOwner(), owner);
+    assertEquals(account.getCoOwners().size(), 0);
+  }
+
+  @Test
+  void constructorInitializesBalanceToZero() {
+    Account account =
+        new Account(
+            123456789L,
+            "account",
+            new Branch(1L, "Branch 1", "Paseo Colón 950"),
+            new Client(96113425L, "Carlos", "Castillo"));
+
+    assertEquals(account.getBalance(), 0.0);
+  }
+
+  @Test
+  void constructorSetsBalanceCorrectly() {
+    Double balance = 56471.2;
+
+    Account account =
+        new Account(
+            123456789L,
+            "account",
+            new Branch(1L, "Branch 1", "Paseo Colón 950"),
+            new Client(96113425L, "Carlos", "Castillo"),
+            balance);
+
+    assertEquals(account.getBalance(), balance);
+  }
+
+  @Test
+  void constructorThrowsExceptionIfAliasIsNull() {
+    String alias = null;
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L,
+                    alias,
+                    new Branch(1L, "Branch 1", "Paseo Colón 950"),
+                    new Client(96113425L, "Carlos", "Castillo")));
+
+    assertEquals(exception.getMessage(), "Alias cannot be null.");
+  }
+
+  @Test
+  void constructorThrowsExceptionIfBranchIsNull() {
+    Branch branch = null;
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
+
+    assertEquals(exception.getMessage(), "Branch cannot be null.");
+  }
+
+  @Test
+  void constructorThrowsExceptionIfBranchIsClosed() {
+    Branch branch = new Branch(1L, "Branch 1", "Paseo Colón 950");
+
+    branch.setOpen(false);
+
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () ->
+                new Account(
+                    123456789L, "account", branch, new Client(96113425L, "Carlos", "Castillo")));
+
+    assertEquals(exception.getMessage(), "Branch cannot be closed.");
+  }
+
+  @Test
+  void constructorThrowsExceptionIfOwnerIsNull() {
+    Client owner = null;
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner));
+
+    assertEquals(exception.getMessage(), "Owner cannot be null.");
+  }
 
-        Account account = new Account(cbu, alias);
+  @Test
+  void constructorThrowsExceptionIfBalanceIsNegative() {
+    Double balance = -50.0;
 
-        assertEquals(account.getCbu(), cbu);
-        assertEquals(account.getAlias(), alias);
-    }
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                new Account(
+                    123456789L,
+                    "account",
+                    new Branch(1L, "Branch 1", "Paseo Colón 950"),
+                    new Client(96113425L, "Carlos", "Castillo"),
+                    balance));
 
-    @Test
-    void constructorShouldInitializeBalanceToZero() {
-        Account account = new Account(123456789L, "account");
-        assertEquals(0.0, account.getBalance());
-    }
+    assertEquals(exception.getMessage(), "Balance cannot be negative.");
+  }
 
-    @Test
-    void constructorShouldSetBalanceCorrectly() {
-        Account account = new Account(123456789L, "account", 100.0);
-        assertEquals(100.0, account.getBalance());
-    }
+  @Test
+  void settingNewOwnerChangesTheAccountOwner() {
+    Client owner = new Client(98765421L, "Carlos", "Castillo");
+    Client newOwner = new Client(11231232L, "Eduardo", "Pereira");
 
-    @Test
-    void constructorShouldThrowExceptionIfBalanceIsNegative() {
-        double balance = -50.0;
+    Account account =
+        new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
 
-        Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> new Account(123456789L, "account", balance));
+    account.setOwner(newOwner);
 
-        assertEquals(exception.getMessage(), "Balance cannot be negative.");
-    }
+    assertEquals(account.getOwner(), newOwner);
+  }
 
-    @Test
-    void setBalanceShouldThrowExceptionIfBalanceIsNegative() {
-        Account account = dummyAccount();
+  @Test
+  void settingNewOwnerAddsThePreviousOwnerAsCoOwner() {
+    Client owner = new Client(98765421L, "Carlos", "Castillo");
+    Client newOwner = new Client(11231232L, "Eduardo", "Pereira");
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> account.setBalance(-1.0));
+    Account account =
+        new Account(123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), owner);
 
-        assertEquals(exception.getMessage(), "Balance cannot be negative.");
-    }
+    account.setOwner(newOwner);
 
-    @Test
-    void depositShouldIncreaseBalance() {
-        Account account = dummyAccount();
+    assertEquals(account.getCoOwners().size(), 1);
+    assertTrue(account.getCoOwners().contains(owner));
+  }
 
-        account.deposit(51.2);
+  @Test
+  void settingNullOwnerThrowsException() {
+    Account account = dummyAccount();
 
-        assertEquals(51.2, account.getBalance());
-    }
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> account.setOwner(null));
 
-    @Test
-    void depositShouldThrowExceptionForNegativeAmount() {
-        Account account = dummyAccount();
+    assertEquals(exception.getMessage(), "New owner cannot be null.");
+  }
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> account.deposit(-10.0));
+  @Test
+  void settingNullCoOwnerThrowsException() {
+    Account account = dummyAccount();
 
-        assertEquals(exception.getMessage(), "Amount has to be positive.");
-    }
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> account.setCoOwner(null));
 
-    @Test
-    void withdrawShouldDecreaseBalance() {
-        Account account = dummySenderAccount(100.0);
+    assertEquals(exception.getMessage(), "New co-owner cannot be null.");
+  }
 
-        assertDoesNotThrow(() -> account.withdraw(30.0));
+  @Test
+  void settingNewCoOwnersAddsThemToCoOwnersList() {
+    Account account = dummyAccount();
 
-        assertEquals(account.getBalance(), 70.0);
-    }
+    Client client1 = new Client(98765421L, "Wendollin", "Hernández");
+    Client client2 = new Client(11231232L, "Eduardo", "Pereira");
+    Client client3 = new Client(67584921L, "Flavio", "Castillo");
 
-    @Test
-    void withdrawShouldThrowExceptionIfAmountExceedsBalance() {
-        Account account = dummySenderAccount(100.0);
+    account.setCoOwner(client1);
+    account.setCoOwner(client2);
+    account.setCoOwner(client3);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> account.withdraw(150.0));
+    assertEquals(account.getCoOwners().size(), 3);
+    assertTrue(account.getCoOwners().contains(client1));
+    assertTrue(account.getCoOwners().contains(client2));
+    assertTrue(account.getCoOwners().contains(client3));
+  }
 
-        assertEquals(exception.getMessage(), "Not enough funds.");
-    }
+  @Test
+  void settingAlreadySetCoOwnerThrowsException() {
+    Account account = dummyAccount();
+
+    Client coOwner = new Client(98765421L, "Wendollin", "Hernández");
 
-    @Test
-    void withdrawShouldThrowExceptionForNegativeAmount() {
-        Account account = dummySenderAccount(100.0);
+    account.setCoOwner(coOwner);
+
+    Exception exception =
+        assertThrows(IllegalStateException.class, () -> account.setCoOwner(coOwner));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> account.withdraw(-10.0));
+    assertEquals(exception.getMessage(), "Client is already an account co-owner.");
+    assertEquals(account.getCoOwners().size(), 1);
+  }
 
-        assertEquals(exception.getMessage(), "Amount cannot be negative.");
-    }
+  @Test
+  void settingOwnerAsCoOwnerThrowsException() {
+    Account account = dummyAccount();
 
-    @Test
-    void withdrawShouldAllowExactAmount() {
-        Account account = dummySenderAccount(100.0);
+    Exception exception =
+        assertThrows(IllegalStateException.class, () -> account.setCoOwner(account.getOwner()));
 
-        assertDoesNotThrow(() -> account.withdraw(100.0));
+    assertEquals(exception.getMessage(), "Account owner cannot be set as co-owner.");
+  }
 
-        assertEquals(account.getBalance(), 0.0);
-    }
+  @Test
+  void settingAccountAliasToAvailableAlias() {
+    Account account = dummyAccount();
+    String[] takenAliases = {"otherAlias1", "otherAlias2"};
 
-    @Test
-    void transferShouldThrowExceptionIfTargetAccountIsNull() {
-        Account account = dummySenderAccount(100.0);
+    String alias = "differentAlias1";
+    account.setAlias(alias, Arrays.asList(takenAliases));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> account.transfer(null, 100.0));
+    assertEquals(account.getAlias(), alias);
+  }
 
-        assertEquals(exception.getMessage(), "Receiver account cannot be null.");
-    }
+  @Test
+  void settingAccountAliasToAnAlreadyTakenAlias() {
+    Account account = dummyAccount();
+    String[] takenAliases = {"otherAlias1", "otherAlias2"};
 
-    @Test
-    void transferShouldThrowExceptionIfTargetAccountIsTheSameAsSender() {
-        Account sender = dummySenderAccount(100.0);
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () -> account.setAlias(takenAliases[0], Arrays.asList(takenAliases)));
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> sender.transfer(sender, 100.0));
+    assertEquals(exception.getMessage(), "Alias already in use by another account.");
+  }
 
-        assertEquals(exception.getMessage(), "Receiver account cannot be same as sender.");
+  @Test
+  void settingAccountAliasToTheSameAliasThrowsException() {
+    Account account = dummyAccount();
+    String[] takenAliases = {};
 
-        exception = assertThrows(IllegalArgumentException.class,
-                () -> sender.transfer(new Account(sender.getCbu(), sender.getAlias(), 100.0), 100.0));
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () -> account.setAlias(account.getAlias(), Arrays.asList(takenAliases)));
 
-        assertEquals(exception.getMessage(), "Receiver account cannot be same as sender.");
-    }
+    assertEquals(exception.getMessage(), "Account alias is already set to this value.");
+  }
 
-    @Test
-    void transferShouldThrowExceptionIfAmountIsNegative() {
-        Account sender = dummySenderAccount(100.0);
-        Account receiver = dummyReceiverAccount(0.0);
+  @Test
+  void comparingTwoAccountsForEquality() {
+    long Cbu1 = 123456789L;
+    String alias1 = "alias1";
+    Branch branch1 = new Branch(1L, "Branch 1", "Paseo Colón 950");
+    Client owner1 = new Client(1L, "Carlos", "Castillo");
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> sender.transfer(receiver, -100.0));
+    long Cbu2 = 987654321L;
+    String alias2 = "alias2";
+    Branch branch2 = new Branch(2L, "Branch 2", "Las Heras 2214");
+    Client owner2 = new Client(2L, "Eduardo", "Pereira");
 
-        assertEquals(exception.getMessage(), "Amount cannot be negative.");
-    }
+    assertEquals(
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch1, owner1));
 
-    @Test
-    void transferShouldDecreaseBalanceFromSenderAccount() {
-        Account sender = dummySenderAccount(100.0);
-        Account receiver = dummyReceiverAccount(0.0);
+    assertNotEquals(
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu2, alias1, branch1, owner1));
+    assertNotEquals(
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias2, branch1, owner1));
+    assertNotEquals(
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch2, owner1));
+    assertNotEquals(
+        new Account(Cbu1, alias1, branch1, owner1), new Account(Cbu1, alias1, branch1, owner2));
+  }
 
-        sender.transfer(receiver, 30.0);
+  @Test
+  void settingCurrentOwnerAsNewOwnerThrowsException() {
+    Account account = dummyAccount();
+    Client currentOwner = account.getOwner();
 
-        assertEquals(sender.getBalance(), 70.0);
-    }
+    Exception exception =
+        assertThrows(IllegalStateException.class, () -> account.setOwner(currentOwner));
 
-    @Test
-    void transferShouldIncreaseBalanceFromTargetAccount() {
-        Account sender = dummySenderAccount(100.0);
-        Account receiver = dummyReceiverAccount(0.0);
+    assertEquals(exception.getMessage(), "New owner cannot be the same as current owner.");
+  }
 
-        sender.transfer(receiver, 30.0);
-        assertEquals(receiver.getBalance(), 30.0);
+  @Test
+  void settingNewOwnerReplacesExistingCoOwner() {
+    Client originalOwner = new Client(98765421L, "Carlos", "Castillo");
+    Client firstNewOwner = new Client(11231232L, "Eduardo", "Pereira");
+    Client secondNewOwner = new Client(33445566L, "Ana", "García");
 
-        sender.transfer(receiver, 20.0);
-        assertEquals(receiver.getBalance(), 50.0);
-    }
+    Account account =
+        new Account(
+            123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), originalOwner);
 
-    @Test
-    void transferShouldThrowExceptionWhenTheAmountExceedsTheSenderAccountBalance() {
-        Account sender = dummySenderAccount(100.0);
-        Account receiver = dummyReceiverAccount(0.0);
+    account.setOwner(firstNewOwner);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> sender.transfer(receiver, 2000.0));
+    assertEquals(account.getOwner(), firstNewOwner);
+    assertTrue(account.getCoOwners().contains(originalOwner));
 
-        assertEquals(exception.getMessage(), "Not enough funds.");
-    }
+    account.setOwner(secondNewOwner);
 
-    @Test
-    void transferShouldAllowExactAmount() {
-        Account sender = dummySenderAccount(100.0);
-        Account receiver = dummyReceiverAccount(0.0);
+    assertEquals(account.getOwner(), secondNewOwner);
+    assertTrue(account.getCoOwners().contains(firstNewOwner));
+    assertTrue(account.getCoOwners().contains(originalOwner));
+  }
 
-        assertDoesNotThrow(() -> sender.transfer(receiver, sender.getBalance()));
-        assertEquals(sender.getBalance(), 0.0);
-    }
+  @Test
+  void settingCoOwnerAsNewOwnerRemovesThemFromCoOwners() {
+    Client originalOwner = new Client(98765421L, "Carlos", "Castillo");
+    Client coOwner = new Client(11231232L, "Eduardo", "Pereira");
 
-    @Test
-    void withdrawingFromAnAccountLogsTheWithdrawal() {
-        Account account = new Account(123456789L, "account", 200.0);
+    Account account =
+        new Account(
+            123456789L, "account", new Branch(1L, "Branch 1", "Paseo Colón 950"), originalOwner);
 
-        TransferLog transferLog = account.withdraw(10.0);
+    account.setCoOwner(coOwner);
+    assertTrue(account.getCoOwners().contains(coOwner));
 
-        assertEquals(transferLog.getType(), "withdrawal");
-        assertEquals(transferLog.getAmount(), 10.0);
+    account.setOwner(coOwner);
 
-        HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+    assertEquals(account.getOwner(), coOwner);
+    assertFalse(account.getCoOwners().contains(coOwner));
+    assertTrue(account.getCoOwners().contains(originalOwner));
+    assertEquals(account.getCoOwners().size(), 1);
+  }
 
-        assertEquals(associatedAccountsCbus.size(), 1);
-        assertTrue(associatedAccountsCbus.contains(account.getCbu()));
-    }
+  @Test
+  void removeCoOwnerRemovesExistingCoOwner() {
+    Account account = dummyAccount();
+    Client coOwner = new Client(98765421L, "Wendollin", "Hernández");
 
-    @Test
-    void depositingIntoAnAccountLogsTheDeposit() {
-        Account account = new Account(123456789L, "account", 200.0);
+    account.setCoOwner(coOwner);
+    assertTrue(account.getCoOwners().contains(coOwner));
 
-        TransferLog transferLog = account.deposit(10.0);
+    account.removeCoOwner(coOwner);
 
-        assertEquals(transferLog.getType(), "deposit");
-        assertEquals(transferLog.getAmount(), 10.0);
+    assertFalse(account.getCoOwners().contains(coOwner));
+    assertEquals(account.getCoOwners().size(), 0);
+  }
 
-        HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+  @Test
+  void removeCoOwnerThrowsExceptionWhenCoOwnerIsNull() {
+    Account account = dummyAccount();
 
-        assertEquals(associatedAccountsCbus.size(), 1);
-        assertTrue(associatedAccountsCbus.contains(account.getCbu()));
-    }
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> account.removeCoOwner(null));
 
-    @Test
-    void transferingBetweenAccountsLogsTheTransfer() {
-        Account sender = new Account(123456789L, "sender", 200.0);
-        Account receiver = new Account(987654321L, "receiver", 0.0);
+    assertEquals(exception.getMessage(), "Co-owner to remove cannot be null.");
+  }
 
-        TransferLog transferLog = sender.transfer(receiver, 10.0);
+  @Test
+  void removeCoOwnerThrowsExceptionWhenClientIsNotCoOwner() {
+    Account account = dummyAccount();
+    Client nonCoOwner = new Client(98765421L, "Wendollin", "Hernández");
 
-        assertEquals(transferLog.getType(), "transfer");
-        assertEquals(transferLog.getAmount(), 10.0);
+    Exception exception =
+        assertThrows(IllegalStateException.class, () -> account.removeCoOwner(nonCoOwner));
 
-        HashSet<Long> associatedAccountsCbus = transferLog.getAssociatedAccountsCbus();
+    assertEquals(exception.getMessage(), "Client is not a co-owner of this account.");
+  }
 
-        assertEquals(associatedAccountsCbus.size(), 2);
-        assertTrue(associatedAccountsCbus.contains(sender.getCbu()));
-        assertTrue(associatedAccountsCbus.contains(receiver.getCbu()));
-    }
+  @Test
+  void removeCoOwnerOnlyRemovesSpecificCoOwner() {
+    Account account = dummyAccount();
+    Client coOwner1 = new Client(98765421L, "Wendollin", "Hernández");
+    Client coOwner2 = new Client(11231232L, "Eduardo", "Pereira");
 
-    @Test
-    void comparingTwoAccountsForEquality() {
-        assertEquals(new Account(123456789L, "alias"), new Account(123456789L, "alias"));
-        assertNotEquals(new Account(123456789L, "account1"), new Account(123456789L, "account2"));
-        assertNotEquals(new Account(123456789L, "account"), new Account(987654321L, "account"));
-    }
+    account.setCoOwner(coOwner1);
+    account.setCoOwner(coOwner2);
+    assertEquals(account.getCoOwners().size(), 2);
 
-    private Account dummyAccount() {
-        return dummySenderAccount(0.0);
-    }
+    account.removeCoOwner(coOwner1);
 
-    private Account dummySenderAccount(double balance) {
-        return new Account(123456789L, "sender", balance);
-    }
+    assertFalse(account.getCoOwners().contains(coOwner1));
+    assertTrue(account.getCoOwners().contains(coOwner2));
+    assertEquals(account.getCoOwners().size(), 1);
+  }
 
-    private Account dummyReceiverAccount(double balance) {
-        return new Account(987654321L, "receiver", balance);
-    }
+  private Account dummyAccount() {
+    return new Account(
+        123456789L,
+        "account",
+        new Branch(1L, "Branch 1", "Paseo Colón 950"),
+        new Client(96113425L, "Carlos", "Castillo"));
+  }
 }

@@ -1,43 +1,58 @@
 package memo1.ejercicio1;
 
+import java.util.Objects;
+
 public class Branch {
-	private int code;
-	private String name;
-	private String address;
-	private boolean open;
+  private long code;
+  private String name;
+  private String address;
+  private boolean open;
 
-	public Branch(int code, String name, String address) {
-		this.code = code;
-		this.name = name;
-		this.address = address;
-		this.open = false;
-	}
+  public Branch(long code, String name, String address) {
+    this.code = code;
+    this.name = name;
+    this.address = address;
+    this.open = true;
+  }
 
-	public int getCode() {
-		return code;
-	}
+  public long getCode() {
+    return code;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getAddress() {
-		return address;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setOpen(boolean open) {
-		this.open = open;
-	}
+  public String getAddress() {
+    return address;
+  }
 
-	public boolean isOpen() {
-		return open;
-	}
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public boolean getOpen() {
+    return open;
+  }
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
+  public void setOpen(boolean open) {
+    this.open = open;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    } else if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+
+    Branch otherBranch = (Branch) obj;
+
+    return Objects.equals(getCode(), otherBranch.getCode());
+  }
 }

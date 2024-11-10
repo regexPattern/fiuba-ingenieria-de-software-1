@@ -3,69 +3,128 @@ package memo1.ejercicio1;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
-
 import org.junit.jupiter.api.Test;
 
 class ClientRegistryTest {
-	@Test
-	void aClientRegistryIsCreatedWithNoClients() {
-		ClientRegistry clientRegistry = new ClientRegistry();
 
-		assertEquals(clientRegistry.getRegisteredClients().size(), 0);
-	}
+  @Test
+  void clientRegistryIsCreatedWithNoClients() {
+    ClientRegistry clientRegistry = new ClientRegistry();
 
-	@Test
-	void registerClientsToAClientRegistry() {
-		ClientRegistry clientRegistry = new ClientRegistry();
-		Client client1 = new Client(123456789L, "Carlos", "Castillo");
-		Client client2 = new Client(987654321L, "Eduardo", "Pereira");
+    assertEquals(clientRegistry.getClients().size(), 0);
+  }
 
-		clientRegistry.registerClient(client1);
-		clientRegistry.registerClient(client2);
+  @Test
+  void registerClientsToClientRegistry() {
+    ClientRegistry clientRegistry = new ClientRegistry();
+    Client client1 = new Client(123456789L, "Carlos", "Castillo");
+    Client client2 = new Client(987654321L, "Eduardo", "Pereira");
 
-		ArrayList<Client> registeredClients = clientRegistry.getRegisteredClients();
+    clientRegistry.register(client1);
+    clientRegistry.register(client2);
 
-		assertEquals(registeredClients.size(), 2);
-		assertTrue(registeredClients.contains(client1));
-		assertTrue(registeredClients.contains(client2));
-	}
+    ArrayList<Client> registeredClients = clientRegistry.getClients();
 
-	@Test
-	void tryingToUnregisterAClientThatIsNotYetRegisteredReturnsNull() {
-		ClientRegistry clientRegistry = new ClientRegistry();
-		Long dni = 987654321L;
+    assertEquals(registeredClients.size(), 2);
+    assertTrue(registeredClients.contains(client1));
+    assertTrue(registeredClients.contains(client2));
+  }
 
-		clientRegistry.registerClient(new Client(123456789L, "Carlos", "Castillo"));
+  @Test
+  void unregisteringNonExistentClientThrowsException() {
+    ClientRegistry clientRegistry = new ClientRegistry();
+    AccountRegistry accountRegistry = new AccountRegistry();
+    MarriageRegistry marriageRegistry = new MarriageRegistry();
 
-		assertNull(clientRegistry.unregisterClient(dni));
-	}
+    long dni = 987654321L;
 
-	@Test
-	void unregisteringAClientFromAClientRegistryReturnsTheClient() {
-		ClientRegistry clientRegistry = new ClientRegistry();
-		Client client = new Client(123456789L, "Carlos", "Castillo");
+    clientRegistry.register(new Client(123456789L, "Carlos", "Castillo"));
 
-		clientRegistry.registerClient(client);
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () -> clientRegistry.unregister(dni, accountRegistry, marriageRegistry));
 
-		assertEquals(clientRegistry.unregisterClient(client.getDni()), client);
-		assertEquals(clientRegistry.getRegisteredClients().size(), 0);
-	}
+    assertEquals(exception.getMessage(), "Client not found.");
+  }
 
-	@Test
-	void anAccountCanBeAddedBackToAClientRegistryAfterBeingUnregistered() {
-		ClientRegistry clientRegistry = new ClientRegistry();
-		Client client = new Client(123456789L, "Carlos", "Castillo");
+  @Test
+  void unregisteringClientFromAClientRegistryReturnsTheClient() {
+    ClientRegistry clientRegistry = new ClientRegistry();
+    AccountRegistry accountRegistry = new AccountRegistry();
+    MarriageRegistry marriageRegistry = new MarriageRegistry();
 
-		clientRegistry.registerClient(client);
+    Client client = new Client(123456789L, "Carlos", "Castillo");
 
-		assertEquals(clientRegistry.getRegisteredClients().get(0), client);
+    clientRegistry.register(client);
 
-		clientRegistry.unregisterClient(client.getDni());
+    assertEquals(
+        clientRegistry.unregister(client.getDni(), accountRegistry, marriageRegistry), client);
+    assertEquals(clientRegistry.getClients().size(), 0);
+  }
 
-		assertEquals(clientRegistry.getRegisteredClients().size(), 0);
+  @Test
+  void accountCanBeAddedBackToAClientRegistryAfterBeingUnregistered() {
+    ClientRegistry clientRegistry = new ClientRegistry();
+    AccountRegistry accountRegistry = new AccountRegistry();
+    MarriageRegistry marriageRegistry = new MarriageRegistry();
 
-		clientRegistry.registerClient(client);
+    Client client = new Client(123456789L, "Carlos", "Castillo");
 
-		assertEquals(clientRegistry.getRegisteredClients().get(0), client);
-	}
+    clientRegistry.register(client);
+
+    assertEquals(clientRegistry.getClients().get(0), client);
+
+    clientRegistry.unregister(client.getDni(), accountRegistry, marriageRegistry);
+
+    assertEquals(clientRegistry.getClients().size(), 0);
+
+    clientRegistry.register(client);
+
+    assertEquals(clientRegistry.getClients().get(0), client);
+  }
+
+  @Test
+  void unregisteringMarriedClientThrowsException() {
+    ClientRegistry clientRegistry = new ClientRegistry();
+    AccountRegistry accountRegistry = new AccountRegistry();
+    MarriageRegistry marriageRegistry = new MarriageRegistry();
+
+    Client client1 = new Client(123456789L, "Carlos", "Castillo");
+    Client client2 = new Client(987654321L, "Maria", "Rodriguez");
+
+    clientRegistry.register(client1);
+    clientRegistry.register(client2);
+
+    marriageRegistry.register(client1, client2, "01/01/2023");
+
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () -> clientRegistry.unregister(client1.getDni(), accountRegistry, marriageRegistry));
+
+    assertEquals("Cannot delete a client who is currently married.", exception.getMessage());
+  }
+
+  @Test
+  void unregisteringDivorcedClientSucceeds() {
+    ClientRegistry clientRegistry = new ClientRegistry();
+    AccountRegistry accountRegistry = new AccountRegistry();
+    MarriageRegistry marriageRegistry = new MarriageRegistry();
+
+    Client client1 = new Client(123456789L, "Carlos", "Castillo");
+    Client client2 = new Client(987654321L, "Maria", "Rodriguez");
+
+    clientRegistry.register(client1);
+    clientRegistry.register(client2);
+
+    marriageRegistry.register(client1, client2, "01/01/2023");
+    marriageRegistry.disolve(client1, client2);
+
+    Client unregisteredClient =
+        clientRegistry.unregister(client1.getDni(), accountRegistry, marriageRegistry);
+
+    assertEquals(client1, unregisteredClient);
+    assertEquals(1, clientRegistry.getClients().size());
+  }
 }

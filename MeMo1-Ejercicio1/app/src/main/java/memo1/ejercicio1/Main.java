@@ -1,97 +1,102 @@
 package memo1.ejercicio1;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
+// Agregá en Main.java la transferencia de fondos entre dos cuentas y mostrá
+// por consola el nuevo saldo.
+//
+// Agregá en Main.java la creación de cuentas asociadas a titulares, la
+// transferencia de fondos entre dos cuentas por alias y presentá por consola
+// los resultados obtenidos.
+
 public class Main {
-    public static void main(String[] args) {
-        // Crear una instancia de Account
-        Account account1 = new Account(123456789L, "account1");
-        account1.setBalance(1000.0); // Establecer el balance inicial
 
-        // Crear una instancia de Account usando el constructor con saldo inicial
-        Account account2 = new Account(987654321L, "account2", 500.0);
+  public static void main(String[] args) {
+    Branch branchFiuba = new Branch(12124121L, "FIUBA", "Paseo Colón 950");
 
-        // Realizar operaciones de depósito y retiro
-        account1.deposit(200.0); // Depositar 200 en la cuenta 1
-        boolean successWithdraw1 = true;
+    Client client1 = new Client(96113425L, "Carlos", "Castillo");
+    Client client2 = new Client(22335789L, "Eduardo", "Pereira");
+    Client client3 = new Client(45678123L, "Flavio", "Castillo");
 
-        try {
-            account1.withdraw(300.0); // Retirar 300 de la cuenta 1
-        } catch (Exception exception) {
-            successWithdraw1 = false;
-        }
+    Account account1 = new Account(123456789L, "account1", branchFiuba, client1, 1000.0);
+    Account account2 = new Account(124128800L, "account2", branchFiuba, client2, 200.1);
+    Account account3 = new Account(751800901L, "account3", branchFiuba, client3, 541.7);
 
-        account2.deposit(100.0); // Depositar 100 en la cuenta 2
-        boolean successWithdraw2 = true;
+    account1.setCoOwner(client2);
+    account1.setCoOwner(client3);
 
-        try {
-            account2.withdraw(700.0); // Intentar retirar 700 de la cuenta 2 (debería fallar)
-        } catch (Exception exception) {
-            successWithdraw2 = false;
-        }
+    Transaction transferTransaction = account1.transfer(account2, 311.0);
+    Transaction depositTransaction = account2.deposit(751.2);
+    Transaction withdrawalTransaction = account3.withdraw(50.0);
 
-        // Imprimir detalles de las cuentas
-        printAccountBalance(account1, account2);
+    logTransaction(transferTransaction);
+    logTransaction(depositTransaction);
+    logTransaction(withdrawalTransaction);
 
-        // Verificar si las operaciones fueron exitosas
-        System.out.println("Retiro en cuenta 1 fue " + (successWithdraw1 ? "exitoso" : "fallido"));
-        System.out.println("Retiro en cuenta 2 fue " + (successWithdraw2 ? "exitoso" : "fallido"));
-        System.out.println();
+    logAccountBalance(account1);
+    logAccountBalance(account2);
+    logAccountBalance(account3);
 
-        // Transferir fondos de cuenta 1 a cuenta 2
-        Double montoTransferencia = 330.0;
-        boolean successTransferCbu = true;
+    AccountRegistry accountRegister = new AccountRegistry();
 
-        try {
-            account1.transfer(account2, montoTransferencia);
-        } catch (Exception exception) {
-            successTransferCbu = false;
-        }
+    accountRegister.register(account1);
+    accountRegister.register(account2);
+    accountRegister.register(account3);
 
-        System.out.println("Transferencia con monto de " + montoTransferencia + " desde cuenta 1 a cuenta 2 fue "
-                + (successTransferCbu ? "exitosa" : "fallida"));
+    logAccountOwners(account1);
+    logAccountOwners(account2);
+    logAccountOwners(account3);
 
-        printAccountBalance(account1, account2);
+    Transaction transferByAliasTransaction =
+        accountRegister.transfer(account3.getAlias(), account1.getAlias(), 120.0);
 
-        // =====================
-        // ==== EJERCICIO 3 ====
-        // =====================
-        //
-        // Creación de cuentas asociadas a titulares
-        Client client1 = new Client(96113425L, "Carlos", "Castillo");
-        Account account3 = new Account(17642839L, "account3", 2000.0);
-        account3.setOwner(client1);
+    logTransaction(transferByAliasTransaction);
+  }
 
-        Client client2 = new Client(223356789L, "Eduardo", "Pereira");
-        Client client3 = new Client(456789123L, "Flavio", "Castillo");
+  private static void logTransaction(Transaction transaction) {
+    System.out.println("TRANSACTION: " + transaction.getCode());
+    System.out.println(" • TYPE: " + transaction.getType().toUpperCase());
 
-        account3.setCoOwner(client2);
-        account3.setCoOwner(client3);
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    System.out.println(" • DATE: " + transaction.getDate().format(dateFormatter));
 
-        // Transferencia de fondos mediante alias
-        AccountRegistry accountRegister = new AccountRegistry();
-        Branch branch = new Branch(001, "Suc. Belgrano", "Cabilo 980 CABA");
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    System.out.println(" • TIME: " + transaction.getTime().format(timeFormatter));
 
-        accountRegister.registerAccount(account1, branch);
-        accountRegister.registerAccount(account2, branch);
-        accountRegister.registerAccount(account3, branch);
+    System.out.println(" • AMOUNT: $" + transaction.getAmount());
 
-        TransferLog transferLog = accountRegister.transferFromAccountToAccount(account3.getAlias(), account1.getAlias(),
-                120.0);
-
-        System.out.println("Registro de transferencia por alias:");
-        System.out.println("Tipo: " + transferLog.getType());
-        System.out.println("Monto: " + transferLog.getAmount());
-        System.out.println("CBUs de cuentas involucradas: " + transferLog.getAssociatedAccountsCbus());
-        System.out.println("Fecha: " + transferLog.getDate());
-        System.out.println("Hora: " + transferLog.getTime());
+    if (transaction.getType() == "transfer") {
+      System.out.println(" • LINKED ACCOUNTS:");
+      System.out.println("    • SENDER (CBU): " + transaction.getSender().getCbu());
+      System.out.println("    • RECEIVER (CBU): " + transaction.getReceiver().getCbu());
+    } else {
+      System.out.println(" • ACCOUNT (CBU): " + transaction.getSender().getCbu());
     }
 
-    static void printAccountBalance(Account account1, Account account2) {
-        System.out.println("Cuenta 1:");
-        System.out.println("CBU: " + account1.getCbu());
-        System.out.println("Balance: " + account1.getBalance());
+    System.out.println();
+  }
 
-        System.out.println("Cuenta 2:");
-        System.out.println("CBU: " + account2.getCbu());
-        System.out.println("Balance: " + account2.getBalance());
+  private static void logAccountBalance(Account account) {
+    System.out.println("ACCOUNT");
+    System.out.println(" • CBU: " + account.getCbu());
+    System.out.println(" • ALIAS: " + account.getAlias());
+    System.out.println(" • BALANCE: $" + account.getBalance());
+
+    System.out.println();
+  }
+
+  private static void logAccountOwners(Account account) {
+    System.out.println("ACCOUNT (CBU): " + account.getCbu());
+    System.out.println(" • OWNER (DNI): " + account.getOwner().getDni());
+
+    ArrayList<Client> coOwners = account.getCoOwners();
+    System.out.println(" • CO-OWNERS: " + coOwners.size());
+
+    for (Client client : coOwners) {
+      System.out.println("    • CO-OWNER (CBU): " + client.getDni());
     }
+
+    System.out.println();
+  }
 }

@@ -2,107 +2,149 @@ package memo1.ejercicio1;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
 class AccountRegistryTest {
-	@Test
-	void anAccountRegistryIsCreatedWithNoAccounts() {
-		AccountRegistry accountRegistry = new AccountRegistry();
+  @Test
+  void defaultConstructorInitializesAccountRegistryWithNoAccounts() {
+    AccountRegistry accountRegistry = new AccountRegistry();
 
-		assertEquals(accountRegistry.getRegisteredAccounts().size(), 0);
-	}
+    assertEquals(accountRegistry.getAccounts().size(), 0);
+  }
 
-	@Test
-	void registryShouldThrowExceptionWhenTransferingToNonExcitingAccount() {
-		AccountRegistry accountRegistry = new AccountRegistry();
-		Account sender = new Account(123456789L, "sender", 100.0);
+  @Test
+  void registeringAccountsToAnAccountRegistry() {
+    AccountRegistry accountRegistry = new AccountRegistry();
 
-		accountRegistry.registerAccount(sender, dummyBranch());
+    Account account1 = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
+    Account account2 = new Account(711312321L, "account2", dummyBranch(), dummyOwner());
 
-		Exception exception = assertThrows(IllegalArgumentException.class,
-				() -> accountRegistry.transferFromAccountToAccount(sender.getCbu(), 987654321L, 20.0));
+    accountRegistry.register(account1);
+    accountRegistry.register(account2);
 
-		assertEquals(exception.getMessage(), "Receiver account does not exist.");
+    ArrayList<Account> registeredAccounts = accountRegistry.getAccounts();
 
-		exception = assertThrows(IllegalArgumentException.class,
-				() -> accountRegistry.transferFromAccountToAccount(sender.getAlias(), "receiver", 20.0));
+    assertEquals(registeredAccounts.size(), 2);
+    assertTrue(registeredAccounts.contains(account1));
+    assertTrue(registeredAccounts.contains(account2));
+  }
 
-		assertEquals(exception.getMessage(), "Receiver account does not exist.");
-	}
+  @Test
+  void registeringAccountWithRepeatedCbuThrowsException() {
+    AccountRegistry accountRegistry = new AccountRegistry();
 
-	@Test
-	void registryShouldThrowExceptionWhenTransferingFromNonExcitingAccount() {
-		AccountRegistry accountRegistry = new AccountRegistry();
-		Account receiver = new Account(987654321L, "sender", 100.0);
+    Account account = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
 
-		accountRegistry.registerAccount(receiver, dummyBranch());
+    accountRegistry.register(account);
 
-		Exception exception = assertThrows(IllegalArgumentException.class,
-				() -> accountRegistry.transferFromAccountToAccount(123456789L, receiver.getCbu(), 20.0));
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () ->
+                accountRegistry.register(
+                    new Account(account.getCbu(), "account2", dummyBranch(), dummyOwner())));
 
-		assertEquals(exception.getMessage(), "Sender account does not exist.");
+    assertEquals(exception.getMessage(), "CBU already in use by another account.");
+  }
 
-		exception = assertThrows(IllegalArgumentException.class,
-				() -> accountRegistry.transferFromAccountToAccount("receiver", receiver.getAlias(), 20.0));
+  @Test
+  void registeringAccountWithRepeatedAliasThrowsException() {
+    AccountRegistry accountRegistry = new AccountRegistry();
 
-		assertEquals(exception.getMessage(), "Sender account does not exist.");
-	}
+    Account account = new Account(123456789L, "account1", dummyBranch(), dummyOwner());
 
-	@Test
-	void branchGetsAddedToAccountWhenItIsRegistered() {
-		AccountRegistry accountRegistry = new AccountRegistry();
-		Account account = new Account(123456789L, "account");
-		Branch branch = new Branch(001, "Suc. Belgrano", "Cabildo 9000 CABA");
+    accountRegistry.register(account);
 
-		accountRegistry.registerAccount(account, branch);
+    Exception exception =
+        assertThrows(
+            IllegalStateException.class,
+            () ->
+                accountRegistry.register(
+                    new Account(85712312L, account.getAlias(), dummyBranch(), dummyOwner())));
 
-		assertEquals(account.getBranch(), branch);
-	}
+    assertEquals(exception.getMessage(), "Alias already in use by another account.");
+  }
 
-	@Test
-	void settingAnOwnerWhenAnAccountAlreadyHasOneThrowsException() {
-		Account account = new Account(123456789L, "account");
-		Client client1 = new Client(98765421L, "Carlos", "Castillo");
-		Client client2 = new Client(11231232L, "Eduardo", "Pereira");
+  @Test
+  void transferingToNonRegisteredAccountThrowsException() {
+    AccountRegistry accountRegistry = new AccountRegistry();
 
-		account.setOwner(client1);
+    Account sender = dummySenderAccount();
+    Account receiver = dummyReceiverAccount();
 
-		Exception exception = assertThrows(IllegalStateException.class, () -> account.setOwner(client2));
+    accountRegistry.register(sender);
 
-		assertEquals(exception.getMessage(), "Cannot assign multiple owners.");
-	}
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(sender.getCbu(), receiver.getCbu(), 20.0));
 
-	@Test
-	void settingOwnerAlsoAsCoOwnerThrowsException() {
-		Account account = new Account(123456789L, "account");
-		Client owner = new Client(98765421L, "Carlos", "Castillo");
+    String expectedMsg = "Receiver account has not been registered yet.";
 
-		account.setOwner(owner);
+    assertEquals(exception.getMessage(), expectedMsg);
 
-		Exception exception = assertThrows(IllegalStateException.class, () -> account.setCoOwner(owner));
+    exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(sender.getAlias(), receiver.getAlias(), 20.0));
 
-		assertEquals(exception.getMessage(), "Account owner cannot be set as co-owner.");
-	}
+    assertEquals(exception.getMessage(), expectedMsg);
 
-	@Test
-	void settingsCoOwnersAddsThemToTheCoOwnersList() {
-		Account account = new Account(123456789L, "account");
+    exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(sender.getAlias(), null, 20.0));
 
-		Client client1 = new Client(98765421L, "Carlos", "Castillo");
-		Client client2 = new Client(11231232L, "Eduardo", "Pereira");
-		Client client3 = new Client(67584921L, "Flavio", "Castillo");
+    assertEquals(exception.getMessage(), expectedMsg);
+  }
 
-		account.setCoOwner(client1);
-		account.setCoOwner(client2);
-		account.setCoOwner(client3);
+  @Test
+  void transferingFromNonRegisteredAccountThrowsException() {
+    AccountRegistry accountRegistry = new AccountRegistry();
 
-		assertEquals(account.getCoOwners().size(), 3);
-		assertTrue(account.getCoOwners().contains(client1));
-		assertTrue(account.getCoOwners().contains(client2));
-		assertTrue(account.getCoOwners().contains(client3));
-	}
+    Account sender = dummySenderAccount();
+    Account receiver = dummyReceiverAccount();
 
-	static private Branch dummyBranch() {
-		return new Branch(001, "Suc. Belgrano", "Cabildo 1000 CABA");
-	}
+    accountRegistry.register(receiver);
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(sender.getCbu(), receiver.getCbu(), 20.0));
+
+    String expectedMsg = "Sender account has not been registered yet.";
+
+    assertEquals(exception.getMessage(), expectedMsg);
+
+    exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(sender.getAlias(), receiver.getAlias(), 20.0));
+
+    assertEquals(exception.getMessage(), expectedMsg);
+
+    exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> accountRegistry.transfer(null, receiver.getAlias(), 20.0));
+
+    assertEquals(exception.getMessage(), expectedMsg);
+  }
+
+  private Branch dummyBranch() {
+    return new Branch(1L, "Branch 1", "Paseo Colón 950");
+  }
+
+  private Client dummyOwner() {
+    return new Client(96113425L, "Carlos", "Castillo");
+  }
+
+  private Account dummySenderAccount() {
+    return new Account(123456789L, "sender", dummyBranch(), dummyOwner(), 10000.0);
+  }
+
+  private Account dummyReceiverAccount() {
+    return new Account(987654321L, "receiver", dummyBranch(), dummyOwner(), 10000.0);
+  }
 }

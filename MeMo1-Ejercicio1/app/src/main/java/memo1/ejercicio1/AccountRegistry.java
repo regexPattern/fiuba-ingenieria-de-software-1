@@ -5,46 +5,70 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class AccountRegistry {
-	private HashSet<Account> registeredAccounts = new HashSet<>();
-	private HashMap<Long, Account> registeredAccountsByCbu = new HashMap<>();
-	private HashMap<String, Account> registeredAccountsByAlias = new HashMap<>();
 
-	public void registerAccount(Account account, Branch branch) {
-		if (registeredAccountsByCbu.containsKey(account.getCbu())) {
-			throw new IllegalStateException("There is an account already registerd with the same CBU.");
-		} else if (registeredAccountsByAlias.containsKey(account.getAlias())) {
-			throw new IllegalStateException("There is an account already registered with the same alias.");
-		}
+  private HashSet<Account> accounts = new HashSet<>();
+  private HashMap<Long, Account> accountsByCbu = new HashMap<>();
+  private HashMap<String, Account> accountsByAlias = new HashMap<>();
 
-		account.setBranch(branch);
-		registeredAccounts.add(account);
-		registeredAccountsByCbu.put(account.getCbu(), account);
-		registeredAccountsByAlias.put(account.getAlias(), account);
-	}
+  public void register(Account account) {
+    if (accountsByCbu.containsKey(account.getCbu())) {
+      throw new IllegalStateException("CBU already in use by another account.");
+    } else if (accountsByAlias.containsKey(account.getAlias())) {
+      throw new IllegalStateException("Alias already in use by another account.");
+    }
 
-	public ArrayList<Account> getRegisteredAccounts() {
-		return new ArrayList<>(registeredAccounts);
-	}
+    accounts.add(account);
+    accountsByCbu.put(account.getCbu(), account);
+    accountsByAlias.put(account.getAlias(), account);
+  }
 
-	private TransferLog transferFromAccountToAccount(Account sender, Account receiver, Double amount) {
-		if (sender == null) {
-			throw new IllegalArgumentException("Sender account does not exist.");
-		} else if (receiver == null) {
-			throw new IllegalArgumentException("Receiver account does not exist.");
-		}
+  public void unRegister(long cbu) {
+    Account account = accountsByCbu.get(cbu);
 
-		return sender.transfer(receiver, amount);
-	}
+    if (account == null) {
+      throw new IllegalArgumentException("Account has not been registered yet.");
+    } else if (account.getBalance() > 0) {
+      throw new IllegalStateException("Cannot unregister an account that still has funds.");
+    }
 
-	public TransferLog transferFromAccountToAccount(Long senderCbu, Long receiverCbu, Double amount) {
-		Account sender = registeredAccountsByCbu.get(senderCbu);
-		Account receiver = registeredAccountsByCbu.get(receiverCbu);
-		return transferFromAccountToAccount(sender, receiver, amount);
-	}
+    accounts.remove(account);
+    accountsByCbu.remove(account.getCbu());
+    accountsByAlias.remove(account.getAlias());
+  }
 
-	public TransferLog transferFromAccountToAccount(String senderAlias, String receiverAlias, Double amount) {
-		Account sender = registeredAccountsByAlias.get(senderAlias);
-		Account receiver = registeredAccountsByAlias.get(receiverAlias);
-		return transferFromAccountToAccount(sender, receiver, amount);
-	}
+  public ArrayList<Account> getAccounts() {
+    return new ArrayList<>(accounts);
+  }
+
+  public ArrayList<Long> getCbus() {
+    return new ArrayList<>(accountsByCbu.keySet());
+  }
+
+  public ArrayList<String> getAliases() {
+    return new ArrayList<>(accountsByAlias.keySet());
+  }
+
+  public Transaction transfer(long senderCbu, long receiverCbu, double amount) {
+    Account sender = accountsByCbu.get(senderCbu);
+    Account receiver = accountsByCbu.get(receiverCbu);
+
+    return transfer(sender, receiver, amount);
+  }
+
+  public Transaction transfer(String senderAlias, String receiverAlias, double amount) {
+    Account sender = accountsByAlias.get(senderAlias);
+    Account receiver = accountsByAlias.get(receiverAlias);
+
+    return transfer(sender, receiver, amount);
+  }
+
+  private Transaction transfer(Account sender, Account receiver, double amount) {
+    if (sender == null) {
+      throw new IllegalArgumentException("Sender account has not been registered yet.");
+    } else if (receiver == null) {
+      throw new IllegalArgumentException("Receiver account has not been registered yet.");
+    }
+
+    return sender.transfer(receiver, amount);
+  }
 }

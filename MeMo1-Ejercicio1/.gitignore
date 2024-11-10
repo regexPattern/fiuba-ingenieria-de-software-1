@@ -1,7 +1,8 @@
 .gradle
 .settings
+.zed
+/**/.project
+/**/build
 app/.classpath
 app/bin
-app/build
-/**/.project
 flake.*
