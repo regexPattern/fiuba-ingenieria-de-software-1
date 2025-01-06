@@ -48,7 +48,7 @@ jobs:
     
     - name: Build with Gradle Wrapper
       run: |
-        cd MeMo1-Ejercicio1
+        cd app
         chmod 777 ./gradlew
         chmod +x ./gradlew
         ./gradlew dependencies
@@ -56,12 +56,12 @@ jobs:
 
     - name: Run Unit Tests and Generate Reports
       run: |
-        cd MeMo1-Ejercicio1
+        cd app
         ./gradlew test
 
     - name: Run Cucumber Tests and Generate Reports
       run: |
-        cd MeMo1-Ejercicio1
+        cd app
         ./gradlew cucumberTest
 
   # Subir los reportes HTML como artefactos
@@ -70,5 +70,5 @@ jobs:
       with:
         name: test-reports
         path: |
-          MeMo1-Ejercicio1/app/build/reports/tests/test/index.html
-          MeMo1-Ejercicio1/app/build/reports/cucumber/cucumber-html-report.html
+          app/app/build/reports/tests/test/index.html
+          app/app/build/reports/cucumber/cucumber-html-report.html
