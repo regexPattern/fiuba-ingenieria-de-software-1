@@ -6,4 +6,4 @@ Sistema de administración de sucursales, clientes y cuentas bancarias. El objet
 
 ## Capturas
 
-![Screenshot 2025-01-05 at 19 57 30](https://github.com/user-attachments/assets/f743f1cc-3d01-490e-9e1d-3cd232e22d97)
+![fiuba-ingenieria-de-software-1](https://github.com/user-attachments/assets/8d106f52-a5d2-472c-8160-5381b21bf7a6)
